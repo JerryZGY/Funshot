@@ -422,7 +422,7 @@
                 <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources\CYCU0.jpg" Stretch="Fill"/>
                 <Grid Grid.Column="1" Grid.RowSpan="3" Name="Grid_BackgroundRemoved"/>
                 <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
-                <k:KinectSensorChooserUI Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="sensorChooserUi"/>
+                <k:KinectSensorChooserUI Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="SensorChooserUi"/>
                 <Image Grid.Column="2" Name="Image_UserView" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="180" Height="180">
                     <Image.RenderTransform>
@@ -435,9 +435,12 @@
                     </c:KinectTileButton.RenderTransform>
                 </c:KinectTileButton>
             </Grid>
+            <c:KinectScrollViewer Grid.Row="2" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
+                <WrapPanel Name="WrapPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </c:KinectScrollViewer>
             <Grid Name="Grid_Opaque" Grid.Row="1" Grid.RowSpan="2" Background="#00000000" IsHitTestVisible="False">
                 <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
-                <Controls:ProgressRing Name="Controls_ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
+                <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
             </Grid>
         </Grid>
     </c:KinectRegion>
