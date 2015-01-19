@@ -4,7 +4,7 @@
         xmlns:k="clr-namespace:Microsoft.Kinect.Toolkit;assembly=Microsoft.Kinect.Toolkit"
         xmlns:c="clr-namespace:Microsoft.Kinect.Toolkit.Controls;assembly=Microsoft.Kinect.Toolkit.Controls"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="Kinect拍拍" Width="1366" Height="768">
+        Title="Kinect拍拍" Width="1366" Height="768" Closing="windowClosing">
     <Window.Resources>
         <Style x:Key="TileButtonStyle" TargetType="{x:Type c:KinectTileButton}">
             <Setter Property="Width" Value="224"/>
@@ -390,7 +390,7 @@
             </DoubleAnimation>
         </Storyboard>
     </Window.Resources>
-    <c:KinectRegion>
+    <c:KinectRegion Name="KinectRegion">
         <Grid Background="Black">
             <Grid.RowDefinitions>
                 <RowDefinition Height="144"/>
