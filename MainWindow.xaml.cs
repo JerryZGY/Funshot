@@ -428,7 +428,7 @@ namespace KinectPiPi
             DoubleAnimation changeBackgroundAnimation = new DoubleAnimation();
             QuarticEase easingFunction = new QuarticEase();
             Storyboard storyBoard = new Storyboard();
-            Storyboard.SetTargetName(changeBackgroundAnimation, "scrollViewer");
+            Storyboard.SetTargetName(changeBackgroundAnimation, "ScrollViewer");
             Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(KinectScrollViewer.HeightProperty));
             changeBackgroundAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.4));
             changeBackgroundAnimation.EasingFunction = easingFunction;
