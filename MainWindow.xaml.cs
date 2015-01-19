@@ -133,14 +133,19 @@ namespace KinectPiPi
             this.sensorChooser.Start();
             var regionSensorBinding = new Binding("Kinect") { Source = this.sensorChooser };
             BindingOperations.SetBinding(this.KinectRegion, KinectRegion.KinectSensorProperty, regionSensorBinding);
-            // Clear out placeholder content
-            //this.wrapPanel.Children.Clear();
-            // Add in display content
-            /*for (var index = 0; index < 10; ++index)
+            for (var index = 0; index < 14; index++)
             {
-                var button = new KinectTileButton { Label = ( index + 1 ).ToString(CultureInfo.CurrentCulture) };
-                this.wrapPanel.Children.Add(button);
-            }*/
+                var button = new KinectTileButton {
+                    Label = index,
+                    Style = (Style)this.Resources["ImageButtonStyle"],
+                    Background = new ImageBrush {
+                        ImageSource = new BitmapImage(new Uri(@"Resources/CYCU" + index + ".jpg", UriKind.Relative)),
+                        Stretch = Stretch.Uniform
+                    }
+                };
+                button.Click += Button_Image_Click;
+                WrapPanel.Children.Add(button);
+            }
             this.updatePagingButtonState();
             ScrollViewer.ScrollChanged += (o, e) => this.updatePagingButtonState();
             for (int i = 0; i < maxUsers; ++i)
@@ -557,6 +562,12 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_ChangeBackground);
             storyBoard.Begin();
             Image_Result.Source = null;
+        }
+
+        private void Button_Image_Click (object sender, RoutedEventArgs e)
+        {
+            KinectTileButton button = (KinectTileButton)sender;
+            Image_Background.Source = new BitmapImage(new Uri("Resources/CYCU" + button.Label as string + ".jpg", UriKind.Relative));
         }
     }
 }
