@@ -161,6 +161,22 @@
       <Link>KinectInteraction180_32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\CYCU0.jpg" />
+    <Resource Include="Resources\CYCU1.jpg" />
+    <Resource Include="Resources\CYCU10.jpg" />
+    <Resource Include="Resources\CYCU11.JPG" />
+    <Resource Include="Resources\CYCU12.jpg" />
+    <Resource Include="Resources\CYCU13.jpg" />
+    <Resource Include="Resources\CYCU14.jpg" />
+    <Resource Include="Resources\CYCU2.jpg" />
+    <Resource Include="Resources\CYCU3.jpg" />
+    <Resource Include="Resources\CYCU4.jpg" />
+    <Resource Include="Resources\CYCU5.jpg" />
+    <Resource Include="Resources\CYCU6.jpg" />
+    <Resource Include="Resources\CYCU7.JPG" />
+    <Resource Include="Resources\CYCU8.jpg" />
+    <Resource Include="Resources\CYCU9.jpg" />
+    <Resource Include="Resources\header.png" />
     <Resource Include="Resources\Kinect.ico" />
   </ItemGroup>
   <ItemGroup />
