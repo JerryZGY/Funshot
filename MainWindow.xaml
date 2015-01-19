@@ -409,12 +409,12 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <c:KinectTileButton Grid.Column="0" Grid.Row="0" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource TileButtonStyle}">
+                <c:KinectTileButton Grid.Column="0" Grid.Row="0" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource TileButtonStyle}" Click="Button_Screenshot_Click">
                     <c:KinectTileButton.RenderTransform>
                         <TranslateTransform/>
                     </c:KinectTileButton.RenderTransform>
                 </c:KinectTileButton>
-                <c:KinectTileButton  Grid.Column="0" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}">
+                <c:KinectTileButton  Grid.Column="0" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
                     <c:KinectTileButton.RenderTransform>
                         <TranslateTransform/>
                     </c:KinectTileButton.RenderTransform>
@@ -429,7 +429,7 @@
                         <TranslateTransform X="300"/>
                     </Image.RenderTransform>
                 </Image>
-                <c:KinectTileButton  Grid.Column="2" Grid.Row="2" Name="Button_Restart" Content="重新開始" Style="{DynamicResource TileButtonStyle}">
+                <c:KinectTileButton  Grid.Column="2" Grid.Row="2" Name="Button_Restart" Content="重新開始" Style="{DynamicResource TileButtonStyle}" Click="Button_Restart_Click">
                     <c:KinectTileButton.RenderTransform>
                         <TranslateTransform X="300"/>
                     </c:KinectTileButton.RenderTransform>

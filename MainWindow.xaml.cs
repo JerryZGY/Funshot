@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Gma.QrCodeNet.Encoding;
+using Gma.QrCodeNet.Encoding.Windows.Render;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Toolkit;
+using Microsoft.Kinect.Toolkit.Controls;
 
 namespace KinectPiPi
 {
@@ -125,7 +132,7 @@ namespace KinectPiPi
             this.sensorChooser.KinectChanged += sensorChooserOnKinectChanged;
             this.sensorChooser.Start();
             var regionSensorBinding = new Binding("Kinect") { Source = this.sensorChooser };
-            BindingOperations.SetBinding(this.KinectRegion, Microsoft.Kinect.Toolkit.Controls.KinectRegion.KinectSensorProperty, regionSensorBinding);
+            BindingOperations.SetBinding(this.KinectRegion, KinectRegion.KinectSensorProperty, regionSensorBinding);
             // Clear out placeholder content
             //this.wrapPanel.Children.Clear();
             // Add in display content
@@ -385,6 +392,171 @@ namespace KinectPiPi
                 }
             }
             catch (InvalidOperationException) { }
+        }
+
+        private void Button_Screenshot_Click (object sender, RoutedEventArgs e)
+        {
+            if (scrollViewerVisible)
+                setBackgroundPanelVisible(false);
+            Grid_Opaque.IsHitTestVisible = true;
+            Label_Counter.Content = "5";
+            beginCountdownStoryboard();
+            Timer countdownTimer = new Timer(1000);
+            var count = 4;
+            countdownTimer.Elapsed += (s, ev) =>
+            {
+                countdownTimer.Stop();
+                if (count == 0)
+                {
+                    countdownTimer.Enabled = false;
+                    countdownTimer.Stop();
+                    Dispatcher.BeginInvoke(new Action<string>(CounterUpdate), "");
+                    Dispatcher.BeginInvoke(new Action(saveBitmap));
+                }
+                else
+                {
+                    Dispatcher.BeginInvoke(new Action<string>(CounterUpdate), count.ToString());
+                    count--;
+                    countdownTimer.Start();
+                }
+            };
+            countdownTimer.Enabled = true;
+        }
+
+        private void setBackgroundPanelVisible (bool visible)
+        {
+            DoubleAnimation changeBackgroundAnimation = new DoubleAnimation();
+            QuarticEase easingFunction = new QuarticEase();
+            Storyboard storyBoard = new Storyboard();
+            Storyboard.SetTargetName(changeBackgroundAnimation, "scrollViewer");
+            Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(KinectScrollViewer.HeightProperty));
+            changeBackgroundAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.4));
+            changeBackgroundAnimation.EasingFunction = easingFunction;
+            easingFunction.EasingMode = EasingMode.EaseOut;
+            storyBoard.Children.Add(changeBackgroundAnimation);
+            if (!visible)
+            {
+                changeBackgroundAnimation.From = 200;
+                changeBackgroundAnimation.To = 0;
+                Button_ChangeBackground.Content = "更換背景";
+                scrollViewerVisible = false;
+            }
+            else
+            {
+                changeBackgroundAnimation.From = 0;
+                changeBackgroundAnimation.To = 200;
+                Button_ChangeBackground.Content = "隱藏面板";
+                scrollViewerVisible = true;
+            }
+            storyBoard.Begin(ScrollViewer);
+        }
+
+        private void beginCountdownStoryboard ()
+        {
+            Storyboard storyBoard = (Storyboard)this.Resources["CountdownStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as ColorAnimation, Grid_Opaque);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as ColorAnimation, Grid_Opaque);
+            storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = true; };
+            storyBoard.Begin();
+        }
+
+        private void CounterUpdate (string count)
+        {
+            Label_Counter.Content = count;
+        }
+
+        private async void saveBitmap ()
+        {
+            BitmapSource source = Image_Background.Source as BitmapSource;
+            int colorWidth = Convert.ToInt32(Image_Background.ActualWidth);
+            int colorHeight = Convert.ToInt32(Image_Background.ActualHeight);
+            var renderBitmap = new RenderTargetBitmap(colorWidth, colorHeight, 96.0, 96.0, PixelFormats.Pbgra32);
+            var dv = new DrawingVisual();
+            using (var dc = dv.RenderOpen())
+            {
+                var backdropBrush = new VisualBrush(Image_Background);
+                dc.DrawRectangle(backdropBrush, null, new Rect(new Point(), new Size(colorWidth, colorHeight)));
+                var colorBrush = new VisualBrush(Grid_BackgroundRemoved);
+                dc.DrawRectangle(colorBrush, null, new Rect(new Point(), new Size(colorWidth, colorHeight)));
+            }
+            renderBitmap.Render(dv);
+            Image_Result.Source = renderBitmap;
+            drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))));
+            beginShowResultStoryboard();
+        }
+
+        private void drawQrCode (string text)
+        {
+            QrEncoder qrEncoder = new QrEncoder(ErrorCorrectionLevel.M);
+            QrCode qrCode;
+            qrEncoder.TryEncode(text, out qrCode);
+            WriteableBitmap wBitmap = new WriteableBitmap(180, 180, 96, 96, PixelFormats.Gray8, null);
+            new WriteableBitmapRenderer(new FixedModuleSize(4, QuietZoneModules.Two)).Draw(wBitmap, qrCode.Matrix);
+            Image_QrCode.Source = wBitmap;
+        }
+
+        private async Task<HttpWebRequest> postImageHttpWebRequsetAsync (byte[] image)
+        {
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("http://140.135.113.20/kinect/get.php");
+            byte[] bs = Encoding.ASCII.GetBytes(@"img=data:image/jpeg;base64," + Convert.ToBase64String(image));
+            req.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            req.Method = "POST";
+            req.ContentLength = bs.Length;
+            Stream reqStream = await req.GetRequestStreamAsync();
+            reqStream.Write(bs, 0, bs.Length);
+            return req;
+        }
+
+        private async Task<string> getImageUrlAsync (HttpWebRequest req)
+        {
+            WebResponse response = await req.GetResponseAsync();
+            string imageAddress = @"http://140.135.113.20/kinect/index.php?img=" + new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return imageAddress;
+        }
+
+        private byte[] convertImageToByte (RenderTargetBitmap image)
+        {
+            BitmapEncoder encoder = new JpegBitmapEncoder();
+            MemoryStream ms = new MemoryStream();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            encoder.Save(ms);
+            return ms.ToArray();
+        }
+
+        private void beginShowResultStoryboard ()
+        {
+            Storyboard storyBoard = (Storyboard)this.Resources["ShowResultStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Screenshot);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Restart);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Image_QrCode);
+            storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = false; Grid_Opaque.IsHitTestVisible = false; };
+            storyBoard.Begin();
+        }
+
+        private void Button_ChangeBackground_Click (object sender, RoutedEventArgs e)
+        {
+            if (scrollViewerVisible)
+            {
+                setBackgroundPanelVisible(false);
+            }
+            else
+            {
+                setBackgroundPanelVisible(true);
+            }
+        }
+
+        private void Button_Restart_Click (object sender, RoutedEventArgs e)
+        {
+            Storyboard storyBoard = (Storyboard)this.Resources["RestartStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Restart);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_QrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_Screenshot);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_ChangeBackground);
+            storyBoard.Begin();
+            Image_Result.Source = null;
         }
     }
 }
