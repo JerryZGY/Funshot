@@ -55,6 +55,8 @@ namespace KinectPiPi
 
         private const double scrollErrorMargin = 0.001;
 
+        private EllipseGeometry[] ellipseGeometry = new EllipseGeometry[10];
+
         /// <summary>
         /// 捲軸選單是否可見
         /// </summary>
@@ -153,7 +155,82 @@ namespace KinectPiPi
                 Image image = new Image();
                 Grid_BackgroundRemoved.Children.Add(image);
                 this.trackableUsers[i] = new TrackableUser(image);
+                createEllipse(i);
             }
+        }
+
+        private void window_Loaded (object sender, RoutedEventArgs e)
+        {
+            beginStartStoryboard();
+        }
+
+        private void beginStartStoryboard ()
+        {
+            Storyboard storyBoard = (Storyboard)this.Resources["StartStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Image_StartForeground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_StartBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Grid_StartTitle);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Grid_StartTitle);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Explanation);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Canvas_EllipseAnimation);
+            storyBoard.Begin();
+        }
+
+        private void createEllipse (int index)
+        {
+            var randomX = new Random(index * new Random(index).Next(0, 10000)).Next(341, 684);
+            var randomY = new Random(index * new Random(index).Next(0, 10000)).Next(185, 370);
+            if (new Random(index).Next(0, 2) == 0)
+                createEllipse(index, new Point(randomX, randomY), new Point(randomX, 0));
+            else
+                createEllipse(index, new Point(randomX, randomY), new Point(randomX, 739));
+        }
+
+        private void createEllipse (int index, Point from, Point to)
+        {
+            ellipseGeometry[index] = new EllipseGeometry();
+            EllipseGeometry thisEllipseGeometry = ellipseGeometry[index];
+            var hashCode = thisEllipseGeometry.GetHashCode();
+            var hashCodeString = "E" + hashCode.ToString();
+            var randomRadius = new Random(thisEllipseGeometry.GetHashCode()).Next(15, 31);
+            thisEllipseGeometry.Center = from;
+            thisEllipseGeometry.RadiusX = randomRadius;
+            thisEllipseGeometry.RadiusY = randomRadius;
+            this.RegisterName(hashCodeString, thisEllipseGeometry);
+            System.Windows.Shapes.Path myPath = new System.Windows.Shapes.Path()
+            {
+                Name = "myPath" + index,
+                Fill = Brushes.White,
+                Data = thisEllipseGeometry
+            };
+
+            Canvas_EllipseAnimation.Children.Add(myPath);
+            PointAnimation myPointAnimation = new PointAnimation
+            {
+                From = from,
+                To = to,
+                Duration = TimeSpan.FromSeconds(new Random(hashCode).Next(22, 28) * 0.1),
+                //EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseInOut }
+            };
+            Storyboard.SetTargetName(myPointAnimation, hashCodeString);
+            Storyboard.SetTargetProperty(myPointAnimation, new PropertyPath(EllipseGeometry.CenterProperty));
+            Storyboard myStoryboard = new Storyboard();
+            myStoryboard.Children.Add(myPointAnimation);
+            myStoryboard.Completed += (s, e) =>
+            {
+                var ellipseGeometryPosition = thisEllipseGeometry.Center;
+                var circle = (UIElement)LogicalTreeHelper.FindLogicalNode(Canvas_EllipseAnimation, "myPath" + index) as System.Windows.Shapes.Path;
+                Canvas_EllipseAnimation.Children.Remove(circle);
+                this.UnregisterName("E" + hashCode.ToString());
+                var randomX = new Random(hashCode).Next(0, 1367);
+                var randomY = new Random(hashCode).Next(0, 740);
+                if (ellipseGeometryPosition.Y >= ( 700 - thisEllipseGeometry.RadiusX ))
+                    createEllipse(index, ellipseGeometryPosition, new Point(randomX, 0));
+                else
+                    createEllipse(index, ellipseGeometryPosition, new Point(randomX, 739));
+            };
+            myStoryboard.Begin(myPath);
         }
 
         ~MainWindow ()
