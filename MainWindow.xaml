@@ -4,7 +4,7 @@
         xmlns:k="clr-namespace:Microsoft.Kinect.Toolkit;assembly=Microsoft.Kinect.Toolkit"
         xmlns:c="clr-namespace:Microsoft.Kinect.Toolkit.Controls;assembly=Microsoft.Kinect.Toolkit.Controls"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="Kinect拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" Closing="windowClosing" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="window_Loaded">
+        Title="Kinect拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
     <Window.Resources>
         <Style x:Key="TileButtonStyle" TargetType="{x:Type c:KinectTileButton}">
             <Setter Property="Width" Value="224"/>
@@ -323,6 +323,45 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Storyboard x:Key="StartStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="0" Duration="0:0:1.5" BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="0" Duration="0:0:1.5" BeginTime="0:0:2.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:4">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-150" Duration="0:0:1" BeginTime="0:0:4.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:5.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="EnterMainPageStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-768" Duration="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="768" To="0" Duration="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
         <Storyboard x:Key="CountdownStoryboard">
             <ColorAnimation Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)" From="#00000000" To="#CC000000" Duration="0:0:0.5">
                 <ColorAnimation.EasingFunction>
@@ -356,19 +395,49 @@
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5" BeginTime="0:0:0.25">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:0.25">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5" BeginTime="0:0:0.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="-60" Duration="0:0:0.5" BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="65" Duration="0:0:0.5" BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-        <Storyboard x:Key="RestartStoryboard">
+        <Storyboard x:Key="AgainStoryboard">
             <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -378,49 +447,89 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-60" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:0.25">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="65" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5"  BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-        <Storyboard x:Key="StartStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="2.0" Duration="0:0:1.5" BeginTime="0:0:1">
+        <Storyboard x:Key="RestartStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="10.0" Duration="0:0:1.5" BeginTime="0:0:2.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:4">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5" BeginTime="0:0:0.25">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-200" Duration="0:0:1" BeginTime="0:0:4.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-60" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
+            <DoubleAnimation.EasingFunction>
+                <QuarticEase EasingMode="EaseOut"/>
+            </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="65" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="800" To="0" Duration="0:0:1" BeginTime="0:0:5.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5"  BeginTime="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-800" To="0" Duration="0:0:1" BeginTime="0:0:6">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:2" BeginTime="0:0:7">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="768" Duration="0:0:2" BeginTime="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="-768" To="0" Duration="0:0:2" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -429,8 +538,11 @@
     </Window.Resources>
     <c:KinectRegion Name="KinectRegion">
         <Grid>
-            <Grid>
-                <Image Name="Image_StartBackground" Source="Resources\CYCU0.jpg" Stretch="UniformToFill">
+            <Grid Name="Grid_StartPage">
+                <Grid.RenderTransform>
+                    <TranslateTransform/>
+                </Grid.RenderTransform>
+                <Image Name="Image_StartBackground" Source="Resources\CYCU8.jpg" Stretch="UniformToFill">
                     <Image.Effect>
                         <BlurEffect Radius="100"/>
                     </Image.Effect>
@@ -445,25 +557,23 @@
                     <Grid.RenderTransform>
                         <TranslateTransform/>
                     </Grid.RenderTransform>
-                    <TextBlock Text="KinectPiPi" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="Purple">
+                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="Purple">
                         <TextBlock.Effect>
                             <BlurEffect Radius="20" KernelType="Box"/>
                         </TextBlock.Effect>
                     </TextBlock>
-                    <TextBlock Text="KinectPiPi" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
+                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
                 </Grid>
-                <c:KinectTileButton Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}">
+                <c:KinectTileButton Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
                     <c:KinectTileButton.RenderTransform>
-                        <TranslateTransform X="800"/>
-                    </c:KinectTileButton.RenderTransform>
-                </c:KinectTileButton>
-                <c:KinectTileButton Name="Button_Explanation" Content="使用說明" Style="{DynamicResource TileButtonStyle}" Margin="0,400,0,0">
-                    <c:KinectTileButton.RenderTransform>
-                        <TranslateTransform X="-800"/>
+                        <TranslateTransform Y="500"/>
                     </c:KinectTileButton.RenderTransform>
                 </c:KinectTileButton>
             </Grid>
-            <Grid Background="Black" Visibility="Hidden">
+            <Grid Name="Grid_MainPage" Background="Black">
+                <Grid.RenderTransform>
+                    <TranslateTransform Y="768"/>
+                </Grid.RenderTransform>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="144"/>
                     <RowDefinition Height="*"/>
@@ -486,17 +596,42 @@
                             <TranslateTransform/>
                         </c:KinectTileButton.RenderTransform>
                     </c:KinectTileButton>
-                    <c:KinectTileButton  Grid.Column="0" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
+                    <c:KinectTileButton  Grid.Column="0" Grid.Row="1" Name="Button_AddIcon" Content="新增貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_AddIcon_Click">
                         <c:KinectTileButton.RenderTransform>
                             <TranslateTransform/>
                         </c:KinectTileButton.RenderTransform>
                     </c:KinectTileButton>
+                    <c:KinectTileButton  Grid.Column="0" Grid.Row="2" Name="Button_ClearIcon" Content="清除貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_ClearIcon_Click">
+                        <c:KinectTileButton.RenderTransform>
+                            <TranslateTransform/>
+                        </c:KinectTileButton.RenderTransform>
+                    </c:KinectTileButton>
+                    <c:KinectTileButton  Grid.Column="0" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource TileButtonStyle}" Click="Button_Again_Click">
+                        <c:KinectTileButton.RenderTransform>
+                            <TranslateTransform X="-300"/>
+                        </c:KinectTileButton.RenderTransform>
+                    </c:KinectTileButton>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources\CYCU0.jpg" Stretch="Fill"/>
                     <Grid Grid.Column="1" Grid.RowSpan="3" Name="Grid_BackgroundRemoved"/>
+                    <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
-                    <k:KinectSensorChooserUI Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="SensorChooserUi"/>
-                    <Image Grid.Column="2" Name="Image_UserView" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="180" Height="180">
+                    <Image Grid.Column="2" Name="Image_UserView" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <c:KinectTileButton  Grid.Column="2" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
+                        <c:KinectTileButton.RenderTransform>
+                            <TranslateTransform/>
+                        </c:KinectTileButton.RenderTransform>
+                    </c:KinectTileButton>
+                    <c:KinectTileButton  Grid.Column="2" Grid.Row="1" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
+                        <c:KinectTileButton.RenderTransform>
+                            <TranslateTransform X="300"/>
+                        </c:KinectTileButton.RenderTransform>
+                    </c:KinectTileButton>
+                    <Image Grid.Column="2" Grid.Row="0" Name="Image_QrCode" Width="120" Height="120">
+                        <Image.RenderTransform>
+                            <TranslateTransform X="300"/>
+                        </Image.RenderTransform>
+                    </Image>
+                    <Image Grid.Column="2" Grid.Row="0" Name="Image_FBQrCode" Width="120" Height="120">
                         <Image.RenderTransform>
                             <TranslateTransform X="300"/>
                         </Image.RenderTransform>
