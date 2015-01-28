@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,15 +22,14 @@ using Facebook;
 using Gma.QrCodeNet.Encoding;
 using Gma.QrCodeNet.Encoding.Windows.Render;
 using Microsoft.Kinect;
-using Microsoft.Kinect.Toolkit;
-using Microsoft.Kinect.Toolkit.Controls;
+using Microsoft.Kinect.Wpf.Controls;
 
 namespace KinectPiPi
 {
     /// <summary>
     /// MainWindow.xaml 的互動邏輯
     /// </summary>
-    public partial class MainWindow : Window, IDisposable
+    public partial class MainWindow : Window
     {
         public static readonly DependencyProperty PageLeftEnabledProperty = DependencyProperty.Register(
             "PageLeftEnabled", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
@@ -55,17 +55,77 @@ namespace KinectPiPi
             set { this.SetValue(PageRightEnabledProperty, value); }
         }
 
+        /// <summary>
+        /// Gets the bitmap to display
+        /// </summary>
+        public ImageSource ImageSource
+        {
+            get
+            {
+                return this.bitmap;
+            }
+        }
+
+        /// <summary>
+        /// Gets the bitmap to display
+        /// </summary>
+        public ImageSource BodyIndexImageSource
+        {
+            get
+            {
+                return this.bodyIndexBitmap;
+            }
+        }
+
+        /// <summary>
+        /// Collection of colors to be used to display the BodyIndexFrame data.
+        /// </summary>
+        private static readonly uint[] BodyColor =
+        {
+            0x0000FF00,
+            0x00FF0000,
+            0xFFFF4000,
+            0x40FFFF00,
+            0xFF40FF00,
+            0xFF808000,
+        };
+
+        /// <summary>
+        /// Reader for body index frames
+        /// </summary>
+        private BodyIndexFrameReader bodyIndexFrameReader = null;
+
+        /// <summary>
+        /// Description of the data contained in the body index frame
+        /// </summary>
+        private FrameDescription bodyIndexFrameDescription = null;
+
+        /// <summary>
+        /// Intermediate storage for frame data converted to color
+        /// </summary>
+        private uint[] bodyIndexPixels = null;
+
+        /// <summary>
+        /// Size of the RGB pixel in the bitmap
+        /// </summary>
+        private const int BytesPerPixel = 4;
+
+        /// <summary>
+        /// Bitmap to display
+        /// </summary>
+        private WriteableBitmap bodyIndexBitmap = null;
+
         private const double scrollErrorMargin = 0.001;
 
         private Image draggedImage;
 
         private Point mousePosition;
 
-        private EllipseGeometry[] ellipseGeometry = new EllipseGeometry[maxUsers];
+        private EllipseGeometry[] ellipseGeometry = new EllipseGeometry[4];
 
-        private KinectTileButton[] backgroundButtonImageSource = new KinectTileButton[15];
+        private Button[] backgroundButtonImageSource = new Button[15];
 
-        private KinectTileButton[] iconButtonImageSource = new KinectTileButton[10];
+        private Button[] iconButtonImageSource = new Button[10];
 
         /// <summary>
         /// 捲軸選單是否可見
@@ -74,72 +134,40 @@ namespace KinectPiPi
 
         private bool isBackgroundScrollViewer = true;
 
-        private bool isGripinInteraction = false;
+        /// <summary>
+        /// Size of the RGB pixel in the bitmap
+        /// </summary>
+        private readonly int bytesPerPixel = ( PixelFormats.Bgr32.BitsPerPixel + 7 ) / 8;
 
         /// <summary>
-        /// 同時追蹤使用者上限
+        /// Active Kinect sensor
         /// </summary>
-        private const int maxUsers = 4;
+        private KinectSensor kinectSensor = null;
 
         /// <summary>
-        /// 追蹤中的骨架編號陣列
+        /// Coordinate mapper to map one type of point to another
         /// </summary>
-        private readonly int[] trackingIds =
-        {
-            TrackableUser.InvalidTrackingId,
-            TrackableUser.InvalidTrackingId
-        };
+        private CoordinateMapper coordinateMapper = null;
 
         /// <summary>
-        /// 使用者識別區色碼索引
+        /// Reader for depth/color/body index frames
         /// </summary>
-        private readonly uint[] userColors =
-        {
-            0xff000000, // 黑 (背景)
-            0xffff0000, // 紅
-            0xffff00ff, // 洋紅
-            0xff0000ff, // 藍
-            0xff00ffff, // 青
-            0xff00ff00, // 綠
-            0xffffff00, // 黃
-            0xff000000  // 黑 (未使用)
-        };
+        private MultiSourceFrameReader multiFrameSourceReader = null;
 
         /// <summary>
-        /// 可追蹤的去背使用者物件陣列
+        /// The size in bytes of the bitmap back buffer
         /// </summary>
-        private TrackableUser[] trackableUsers = new TrackableUser[maxUsers];
+        private uint bitmapBackBufferSize = 0;
 
         /// <summary>
-        /// Kinect感測器選擇器
+        /// Intermediate storage for the color to depth mapping
         /// </summary>
-        private KinectSensorChooser sensorChooser;
+        private DepthSpacePoint[] colorMappedToDepthPoints = null;
 
         /// <summary>
-        /// 深度影像緩衝區
+        /// Bitmap to display
         /// </summary>
-        private DepthImagePixel[] depthData;
-
-        /// <summary>
-        /// 骨架影像緩衝區
-        /// </summary>
-        private Skeleton[] skeletons;
-
-        /// <summary>
-        /// 使用者識別區圖片物件
-        /// </summary>
-        private WriteableBitmap userViewBitmap;
-
-        /// <summary>
-        /// 下一位使用者索引，用來選擇下一位使用者之骨架
-        /// </summary>
-        private int nextUserIndex = 0;
-
-        /// <summary>
-        /// 是否已處理結束
-        /// </summary>
-        private bool disposed;
-    
+        private WriteableBitmap bitmap = null;
 
         public MainWindow ()
         {
@@ -148,16 +176,46 @@ namespace KinectPiPi
             string result = wc.DownloadString("https://graph.facebook.com/oauth/access_token?client_id=330042973859060&client_secret=25cb17666efcaf603ae18eb46abc5950&scope=manage_notifications,manage_pages,publish_actions");
             string access_token = result.Split('=')[1];*/
 
-            this.sensorChooser = new KinectSensorChooser();
-            this.sensorChooser.KinectChanged += sensorChooserOnKinectChanged;
-            this.sensorChooser.Start();
-            var regionSensorBinding = new Binding("Kinect") { Source = this.sensorChooser };
+            this.kinectSensor = KinectSensor.GetDefault();
+
+            this.multiFrameSourceReader = this.kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Depth | FrameSourceTypes.Color | FrameSourceTypes.BodyIndex);
+
+            this.multiFrameSourceReader.MultiSourceFrameArrived += this.Reader_MultiSourceFrameArrived;
+
+            this.coordinateMapper = this.kinectSensor.CoordinateMapper;
+
+            FrameDescription depthFrameDescription = this.kinectSensor.DepthFrameSource.FrameDescription;
+
+            int depthWidth = depthFrameDescription.Width;
+            int depthHeight = depthFrameDescription.Height;
+
+            FrameDescription colorFrameDescription = this.kinectSensor.ColorFrameSource.FrameDescription;
+
+            int colorWidth = colorFrameDescription.Width;
+            int colorHeight = colorFrameDescription.Height;
+
+            this.colorMappedToDepthPoints = new DepthSpacePoint[colorWidth * colorHeight];
+
+            this.bitmap = new WriteableBitmap(colorWidth, colorHeight, 96.0, 96.0, PixelFormats.Bgra32, null);
+
+            this.bodyIndexFrameDescription = this.kinectSensor.BodyIndexFrameSource.FrameDescription;
+            // allocate space to put the pixels being converted
+            this.bodyIndexPixels = new uint[this.bodyIndexFrameDescription.Width * this.bodyIndexFrameDescription.Height];
+            // create the bitmap to display
+            this.bodyIndexBitmap = new WriteableBitmap(this.bodyIndexFrameDescription.Width, this.bodyIndexFrameDescription.Height, 96.0, 96.0, PixelFormats.Bgr32, null);
+            // Calculate the WriteableBitmap back buffer size
+            this.bitmapBackBufferSize = (uint)( ( this.bitmap.BackBufferStride * ( this.bitmap.PixelHeight - 1 ) ) + ( this.bitmap.PixelWidth * this.bytesPerPixel ) );
+
+            this.kinectSensor.Open();
+            this.DataContext = this;
+
+            var regionSensorBinding = new Binding("Kinect") { Source = this.kinectSensor };
             InitializeComponent();
             for (var index = 0; index < 15; index++)
             {
-                var button = new KinectTileButton
+                var button = new Button
                 {
-                    Label = index,
+                    Tag = index,
                     Style = (Style)this.Resources["ImageButtonStyle"],
                     Background = new ImageBrush
                     {
@@ -170,9 +228,9 @@ namespace KinectPiPi
             }
             for (var index = 0; index < 10; index++)
             {
-                var button = new KinectTileButton
+                var button = new Button
                 {
-                    Label = index,
+                    Tag = index,
                     Style = (Style)this.Resources["ImageButtonStyle"],
                     Background = new ImageBrush
                     {
@@ -186,14 +244,185 @@ namespace KinectPiPi
             BindingOperations.SetBinding(this.KinectRegion, KinectRegion.KinectSensorProperty, regionSensorBinding);
             this.updatePagingButtonState();
             ScrollViewer.ScrollChanged += (o, ev) => this.updatePagingButtonState();
-            for (int i = 0; i < maxUsers; ++i)
+            for (int i = 0; i < 4; ++i)
             {
-                var image = new Image();
-                Grid_BackgroundRemoved.Children.Add(image);
-                this.trackableUsers[i] = new TrackableUser(image);
                 createEllipse(i);
             }
             beginStartStoryboard();
+        }
+
+        /// <summary>
+        /// Handles the depth/color/body index frame data arriving from the sensor
+        /// </summary>
+        /// <param name="sender">object sending the event</param>
+        /// <param name="e">event arguments</param>
+        private void Reader_MultiSourceFrameArrived (object sender, MultiSourceFrameArrivedEventArgs e)
+        {
+            int depthWidth = 0;
+            int depthHeight = 0;
+
+            DepthFrame depthFrame = null;
+            ColorFrame colorFrame = null;
+            BodyIndexFrame bodyIndexFrame = null;
+            bool isBitmapLocked = false;
+            bool bodyIndexFrameProcessed = false;
+            MultiSourceFrame multiSourceFrame = e.FrameReference.AcquireFrame();
+            // If the Frame has expired by the time we process this event, return.
+            if (multiSourceFrame == null)
+            {
+                return;
+            }
+            // We use a try/finally to ensure that we clean up before we exit the function.  
+            // This includes calling Dispose on any Frame objects that we may have and unlocking the bitmap back buffer.
+            try
+            {
+                depthFrame = multiSourceFrame.DepthFrameReference.AcquireFrame();
+                colorFrame = multiSourceFrame.ColorFrameReference.AcquireFrame();
+                bodyIndexFrame = multiSourceFrame.BodyIndexFrameReference.AcquireFrame();
+                // If any frame has expired by the time we process this event, return.
+                // The "finally" statement will Dispose any that are not null.
+                if (( depthFrame == null ) || ( colorFrame == null ) || ( bodyIndexFrame == null ))
+                {
+                    return;
+                }
+                // Process Depth
+                FrameDescription depthFrameDescription = depthFrame.FrameDescription;
+                depthWidth = depthFrameDescription.Width;
+                depthHeight = depthFrameDescription.Height;
+                // Access the depth frame data directly via LockImageBuffer to avoid making a copy
+                using (KinectBuffer depthFrameData = depthFrame.LockImageBuffer())
+                {
+                    this.coordinateMapper.MapColorFrameToDepthSpaceUsingIntPtr(
+                        depthFrameData.UnderlyingBuffer,
+                        depthFrameData.Size,
+                        this.colorMappedToDepthPoints);
+                }
+                // We're done with the DepthFrame 
+                depthFrame.Dispose();
+                depthFrame = null;
+                // Process Color
+                // Lock the bitmap for writing
+                this.bitmap.Lock();
+                isBitmapLocked = true;
+                colorFrame.CopyConvertedFrameDataToIntPtr(this.bitmap.BackBuffer, this.bitmapBackBufferSize, ColorImageFormat.Bgra);
+                // We're done with the ColorFrame 
+                colorFrame.Dispose();
+                colorFrame = null;
+                // We'll access the body index data directly to avoid a copy
+                using (KinectBuffer bodyIndexData = bodyIndexFrame.LockImageBuffer())
+                {
+                    if (( ( this.bodyIndexFrameDescription.Width * this.bodyIndexFrameDescription.Height ) == bodyIndexData.Size ) &&
+                            ( this.bodyIndexFrameDescription.Width == this.bodyIndexBitmap.PixelWidth ) && ( this.bodyIndexFrameDescription.Height == this.bodyIndexBitmap.PixelHeight ))
+                    {
+                        this.ProcessBodyIndexFrameData(bodyIndexData.UnderlyingBuffer, bodyIndexData.Size);
+                        bodyIndexFrameProcessed = true;
+                    }
+                    unsafe
+                    {
+                        byte* bodyIndexDataPointer = (byte*)bodyIndexData.UnderlyingBuffer;
+                        int colorMappedToDepthPointCount = this.colorMappedToDepthPoints.Length;
+                        fixed (DepthSpacePoint* colorMappedToDepthPointsPointer = this.colorMappedToDepthPoints)
+                        {
+                            // Treat the color data as 4-byte pixels
+                            uint* bitmapPixelsPointer = (uint*)this.bitmap.BackBuffer;
+                            // Loop over each row and column of the color image
+                            // Zero out any pixels that don't correspond to a body index
+                            for (int colorIndex = 0; colorIndex < colorMappedToDepthPointCount; ++colorIndex)
+                            {
+                                float colorMappedToDepthX = colorMappedToDepthPointsPointer[colorIndex].X;
+                                float colorMappedToDepthY = colorMappedToDepthPointsPointer[colorIndex].Y;
+                                // The sentinel value is -inf, -inf, meaning that no depth pixel corresponds to this color pixel.
+                                if (!float.IsNegativeInfinity(colorMappedToDepthX) &&
+                                    !float.IsNegativeInfinity(colorMappedToDepthY))
+                                {
+                                    // Make sure the depth pixel maps to a valid point in color space
+                                    int depthX = (int)( colorMappedToDepthX + 0.5f );
+                                    int depthY = (int)( colorMappedToDepthY + 0.5f );
+                                    // If the point is not valid, there is no body index there.
+                                    if (( depthX >= 0 ) && ( depthX < depthWidth ) && ( depthY >= 0 ) && ( depthY < depthHeight ))
+                                    {
+                                        int depthIndex = ( depthY * depthWidth ) + depthX;
+                                        // If we are tracking a body for the current pixel, do not zero out the pixel
+                                        if (bodyIndexDataPointer[depthIndex] != 0xff)
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                }
+                                bitmapPixelsPointer[colorIndex] = 0;
+                            }
+                        }
+                        this.bitmap.AddDirtyRect(new Int32Rect(0, 0, this.bitmap.PixelWidth, this.bitmap.PixelHeight));
+                    }
+                }
+            }
+            finally
+            {
+                if (isBitmapLocked)
+                {
+                    this.bitmap.Unlock();
+                }
+                if (bodyIndexFrameProcessed)
+                {
+                    this.RenderBodyIndexPixels();
+                }
+                if (depthFrame != null)
+                {
+                    depthFrame.Dispose();
+                }
+                if (colorFrame != null)
+                {
+                    colorFrame.Dispose();
+                }
+                if (bodyIndexFrame != null)
+                {
+                    bodyIndexFrame.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Directly accesses the underlying image buffer of the BodyIndexFrame to 
+        /// create a displayable bitmap.
+        /// This function requires the /unsafe compiler option as we make use of direct
+        /// access to the native memory pointed to by the bodyIndexFrameData pointer.
+        /// </summary>
+        /// <param name="bodyIndexFrameData">Pointer to the BodyIndexFrame image data</param>
+        /// <param name="bodyIndexFrameDataSize">Size of the BodyIndexFrame image data</param>
+        private unsafe void ProcessBodyIndexFrameData (IntPtr bodyIndexFrameData, uint bodyIndexFrameDataSize)
+        {
+            byte* frameData = (byte*)bodyIndexFrameData;
+
+            // convert body index to a visual representation
+            for (int i = 0; i < (int)bodyIndexFrameDataSize; ++i)
+            {
+                // the BodyColor array has been sized to match
+                // BodyFrameSource.BodyCount
+                if (frameData[i] < BodyColor.Length)
+                {
+                    // this pixel is part of a player,
+                    // display the appropriate color
+                    this.bodyIndexPixels[i] = BodyColor[frameData[i]];
+                }
+                else
+                {
+                    // this pixel is not part of a player
+                    // display black
+                    this.bodyIndexPixels[i] = 0x00000000;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Renders color pixels into the writeableBitmap.
+        /// </summary>
+        private void RenderBodyIndexPixels ()
+        {
+            this.bodyIndexBitmap.WritePixels(
+                new Int32Rect(0, 0, this.bodyIndexBitmap.PixelWidth, this.bodyIndexBitmap.PixelHeight),
+                this.bodyIndexPixels,
+                this.bodyIndexBitmap.PixelWidth * (int)BytesPerPixel,
+                0);
         }
 
         private void postToFacebook (byte[] filebytes)
@@ -213,10 +442,10 @@ namespace KinectPiPi
             {
                 fb.Post("/764952110260957" + "/photos", upload);
             }
-            catch (Exception e) { }
+            catch (Exception) { }
         }
 
-        private void OnHandPointerLeave (object sender, HandPointerEventArgs e)
+        /*private void OnHandPointerLeave (object sender, HandPointerEventArgs e)
         {
             if (draggedImage != null)
             {
@@ -277,7 +506,7 @@ namespace KinectPiPi
                 handPointerEventArgs.IsInGripInteraction = isGripinInteraction;
             }
             handPointerEventArgs.Handled = true;
-        }
+        }*/
 
         private void beginStartStoryboard ()
         {
@@ -395,40 +624,10 @@ namespace KinectPiPi
                 Grid_StartPage.Visibility = Visibility.Collapsed;
                 ellipseGeometry = null;
                 Canvas_EllipseAnimation.Children.Clear();
-                Grid_BackgroundRemoved.Visibility = Visibility.Visible;
+                Image_BackgroundRemoval.Visibility = Visibility.Visible;
                 Image_UserView.Visibility = Visibility.Visible;
             };
             storyBoard.Begin();
-        }
-
-        ~MainWindow ()
-        {
-            this.Dispose(false);
-        }
-
-        /// <summary>
-        /// 處理結束函式，將釋放此物件的所有資源
-        /// </summary>
-        public void Dispose ()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// 處理結束檢查函式，根據是否已處理結束來決定要不要釋放此物件的所有資源
-        /// </summary>
-        /// <param name="disposing">是否已處理結束</param>
-        protected virtual void Dispose (bool disposing)
-        {
-            if (!this.disposed)
-            {
-                foreach (var user in this.trackableUsers)
-                {
-                    user.Dispose();
-                }
-                this.disposed = true;
-            }
         }
 
         /// <summary>
@@ -441,91 +640,21 @@ namespace KinectPiPi
         }
 
         /// <summary>
-        /// 自動選擇追蹤中的使用者，先追蹤的使用者擁有優先權
-        /// </summary>
-        private void selectTrackedUsers ()
-        {
-            foreach (var skeleton in this.skeletons.Where(s => SkeletonTrackingState.NotTracked != s.TrackingState))
-            {
-                if (this.trackableUsers.Where(u => u.IsTracked).Count() == maxUsers)
-                {
-                    break;
-                }
-                if (this.trackableUsers.Where(u => u.TrackingId == skeleton.TrackingId).Count() == 0)
-                {
-                    toggleUserTracking(skeleton.TrackingId);
-                }
-            }
-        }
-
-        /// <summary>
         /// 處理視窗關閉執行緒
         /// </summary>
         /// <param name="sender">事件發送對象的物件</param>
         /// <param name="e">事件參數</param>
         private void windowClosing (object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.sensorChooser.Stop();
-            this.sensorChooser = null;
-        }
-
-        /// <summary>
-        /// 根據追蹤編號來切換追蹤中的使用者
-        /// </summary>
-        /// <param name="trackingId">欲追蹤的使用者編號</param>
-        private void toggleUserTracking (int trackingId)
-        {
-            if (TrackableUser.InvalidTrackingId != trackingId)
+            if (this.multiFrameSourceReader != null)
             {
-                DateTime minTimestamp = DateTime.MaxValue;
-                TrackableUser trackedUser = null;
-                TrackableUser staleUser = null;
-                foreach (var user in this.trackableUsers)
-                {
-                    if (user.TrackingId == trackingId)
-                    {
-                        trackedUser = user;
-                    }
-                    if (user.Timestamp < minTimestamp)
-                    {
-                        staleUser = user;
-                        minTimestamp = user.Timestamp;
-                    }
-                }
-                if (null != trackedUser)
-                {
-                    trackedUser.TrackingId = TrackableUser.InvalidTrackingId;
-                }
-                else
-                {
-                    staleUser.TrackingId = trackingId;
-                }
+                this.multiFrameSourceReader.Dispose();
+                this.multiFrameSourceReader = null;
             }
-        }
-
-        /// <summary>
-        /// 指示骨架影像來追蹤特定的骨架
-        /// </summary>
-        private void updateChosenSkeletons ()
-        {
-            KinectSensor sensor = this.sensorChooser.Kinect;
-            if (null != sensor)
+            if (this.kinectSensor != null)
             {
-                int trackedUserCount = 0;
-                for (int i = 0; i < maxUsers && trackedUserCount < this.trackingIds.Length; ++i)
-                {
-                    var trackableUser = this.trackableUsers[this.nextUserIndex];
-                    if (trackableUser.IsTracked)
-                    {
-                        this.trackingIds[trackedUserCount++] = trackableUser.TrackingId;
-                    }
-                    this.nextUserIndex = ( this.nextUserIndex + 1 ) % maxUsers;
-                }
-                for (int i = trackedUserCount; i < this.trackingIds.Length; ++i)
-                {
-                    this.trackingIds[i] = TrackableUser.InvalidTrackingId;
-                }
-                sensor.SkeletonStream.ChooseSkeletons(this.trackingIds[0], this.trackingIds[1]);
+                this.kinectSensor.Close();
+                this.kinectSensor = null;
             }
         }
 
@@ -533,7 +662,7 @@ namespace KinectPiPi
         /// 繪製使用者識別區圖像
         /// </summary>
         /// <param name="depthFrame">新的深度影像</param>
-        private void updateUserView (DepthImageFrame depthFrame)
+        /*private void updateUserView (DepthImageFrame depthFrame)
         {
             if (null == this.depthData || this.depthData.Length != depthFrame.PixelDataLength)
             {
@@ -566,83 +695,7 @@ namespace KinectPiPi
             }
             this.userViewBitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             this.userViewBitmap.Unlock();
-        }
-
-        /// <summary>
-        /// Kinect感測器改變函式，將設置所有應用參數並註冊事件
-        /// </summary>
-        /// <param name="oldSensor">上個Kinect感測器</param>
-        /// <param name="newSensor">新的Kinect感測器</param>
-        private void sensorChooserOnKinectChanged (object sender, KinectChangedEventArgs args)
-        {
-            if (null != args.OldSensor)
-            {
-                try
-                {
-                    args.OldSensor.AllFramesReady -= this.sensorAllFramesReady;
-                    args.OldSensor.DepthStream.Disable();
-                    args.OldSensor.ColorStream.Disable();
-                    args.OldSensor.SkeletonStream.Disable();
-                }
-                catch (InvalidOperationException) { }
-            }
-
-            if (null != args.NewSensor)
-            {
-                try
-                {
-                    args.NewSensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
-                    args.NewSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-                    args.NewSensor.SkeletonStream.Enable();
-                    args.NewSensor.SkeletonStream.AppChoosesSkeletons = true;
-                    args.NewSensor.SkeletonStream.EnableTrackingInNearRange = true;
-                    if (null == this.skeletons)
-                    {
-                        this.skeletons = new Skeleton[args.NewSensor.SkeletonStream.FrameSkeletonArrayLength];
-                    }
-                    args.NewSensor.AllFramesReady += this.sensorAllFramesReady;
-                    args.NewSensor.DepthStream.Range = DepthRange.Default;
-                }
-                catch (InvalidOperationException) { }
-            }
-            foreach (var user in this.trackableUsers)
-            {
-                user.OnKinectSensorChanged(args.OldSensor, args.NewSensor);
-            }
-        }
-
-        /// <summary>
-        /// Kinect感測器影像初始化事件
-        /// </summary>
-        /// <param name="sender">事件發送對象的物件</param>
-        /// <param name="e">事件參數</param>
-        private void sensorAllFramesReady (object sender, AllFramesReadyEventArgs e)
-        {
-            if (null == this.sensorChooser || null == this.sensorChooser.Kinect || this.sensorChooser.Kinect != sender)
-            {
-                return;
-            }
-            try
-            {
-                using (var depthFrame = e.OpenDepthImageFrame())
-                {
-                    if (null != depthFrame)
-                    {
-                        this.updateUserView(depthFrame);
-                    }
-                }
-                using (var skeletonFrame = e.OpenSkeletonFrame())
-                {
-                    if (null != skeletonFrame)
-                    {
-                        skeletonFrame.CopySkeletonDataTo(this.skeletons);
-                        selectTrackedUsers();
-                        this.updateChosenSkeletons();
-                    }
-                }
-            }
-            catch (InvalidOperationException) { }
-        }
+        }*/
 
         private void Button_Screenshot_Click (object sender, RoutedEventArgs e)
         {
@@ -682,7 +735,7 @@ namespace KinectPiPi
             QuarticEase easingFunction = new QuarticEase();
             Storyboard storyBoard = new Storyboard();
             Storyboard.SetTargetName(changeBackgroundAnimation, "ScrollViewer");
-            Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(KinectScrollViewer.HeightProperty));
+            Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(ScrollViewer.HeightProperty));
             changeBackgroundAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.4));
             changeBackgroundAnimation.EasingFunction = easingFunction;
             easingFunction.EasingMode = EasingMode.EaseOut;
@@ -710,7 +763,7 @@ namespace KinectPiPi
             QuarticEase easingFunction = new QuarticEase();
             Storyboard storyBoard = new Storyboard();
             Storyboard.SetTargetName(changeBackgroundAnimation, "ScrollViewer");
-            Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(KinectScrollViewer.HeightProperty));
+            Storyboard.SetTargetProperty(changeBackgroundAnimation, new PropertyPath(ScrollViewer.HeightProperty));
             changeBackgroundAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.4));
             changeBackgroundAnimation.EasingFunction = easingFunction;
             easingFunction.EasingMode = EasingMode.EaseOut;
@@ -758,7 +811,7 @@ namespace KinectPiPi
             {
                 var backdropBrush = new VisualBrush(Image_Background);
                 dc.DrawRectangle(backdropBrush, null, new Rect(new Point(), new Size(colorWidth, colorHeight)));
-                var colorBrush = new VisualBrush(Grid_BackgroundRemoved);
+                var colorBrush = new VisualBrush(Image_BackgroundRemoval);
                 dc.DrawRectangle(colorBrush, null, new Rect(new Point(), new Size(colorWidth, colorHeight)));
                 var iconBrush = new VisualBrush(canvas);
                 dc.DrawRectangle(iconBrush, null, new Rect(new Point(), new Size(colorWidth, colorHeight)));
@@ -821,8 +874,7 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Image_QrCode);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Image_FBQrCode);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_BrowseFanPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(8) as DoubleAnimation, Button_Restart);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(9) as DoubleAnimation, Button_Again);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(8) as DoubleAnimation, Button_Again);
             storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = false; Grid_Opaque.IsHitTestVisible = false; };
             storyBoard.Begin();
         }
@@ -851,57 +903,23 @@ namespace KinectPiPi
         private void Button_Again_Click(object sender, RoutedEventArgs e)
         {
             Storyboard storyBoard = (Storyboard)this.Resources["AgainStoryboard"];
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Restart);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Again);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_BrowseFanPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Screenshot);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_ClearIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(8) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Again);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_BrowseFanPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_QrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_FBQrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_Screenshot);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_AddIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_ClearIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_ChangeBackground);
             storyBoard.Begin();
             Image_Result.Source = null;
             canvas.Children.Clear();
-        }
-
-        private void Button_Restart_Click (object sender, RoutedEventArgs e)
-        {
-            Image_Result.Source = null;
-            Button_Start.IsHitTestVisible = false;
-            canvas.Children.Clear();
-            Grid_StartPage.Visibility = Visibility.Visible;
-            Grid_MainPage.IsHitTestVisible = false;
-            Storyboard storyBoard = (Storyboard)this.Resources["RestartStoryboard"];
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Restart);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Again);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_BrowseFanPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Screenshot);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_ClearIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(8) as DoubleAnimation, Button_ChangeBackground);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(9) as DoubleAnimation, Grid_MainPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(10) as DoubleAnimation, Grid_StartPage);
-            storyBoard.Completed += (se, ev) =>
-            {
-                ellipseGeometry = new EllipseGeometry[maxUsers];
-                for (int i = 0; i < maxUsers; i++)
-                {
-                    createEllipse(i);
-                }
-                Grid_BackgroundRemoved.Children.Clear();
-                Grid_MainPage.Visibility = Visibility.Collapsed;
-                Button_Start.IsHitTestVisible = true;
-            };
-            storyBoard.Begin();
         }
 
         private void Button_Image_Click (object sender, RoutedEventArgs e)
         {
-            KinectTileButton button = (KinectTileButton)sender;
-            Image_Background.Source = new BitmapImage(new Uri("Resources/CYCU" + button.Label as string + ".jpg", UriKind.Relative));
+            Button button = (Button)sender;
+            Image_Background.Source = new BitmapImage(new Uri("Resources/CYCU" + button.Tag as string + ".jpg", UriKind.Relative));
         }
 
         private void Button_AddIcon_Click (object sender, RoutedEventArgs e)
@@ -927,12 +945,12 @@ namespace KinectPiPi
 
         private void Button_Icon_Click (object sender, RoutedEventArgs e)
         {
-            KinectTileButton button = (KinectTileButton)sender;
-            var icon = new Image { Source = new BitmapImage(new Uri(@"Resources/ICON" + button.Label as string + ".png", UriKind.Relative)) };
-            KinectRegion.AddQueryInteractionStatusHandler(icon, OnQuery);
+            Button button = (Button)sender;
+            var icon = new Image { Source = new BitmapImage(new Uri(@"Resources/ICON" + button.Tag as string + ".png", UriKind.Relative)) };
+            /*KinectRegion.AddQueryInteractionStatusHandler(icon, OnQuery);
             KinectRegion.AddHandPointerLeaveHandler(icon, OnHandPointerLeave);
             KinectRegion.AddHandPointerMoveHandler(icon, OnHandPointerMove);
-            KinectRegion.SetIsGripTarget(icon, true);
+            KinectRegion.SetIsGripTarget(icon, true);*/
             Canvas.SetLeft(icon, canvas.ActualWidth / 2 - icon.Source.Width / 2);
             Canvas.SetTop(icon, canvas.ActualHeight / 2 - icon.Source.Height / 2);
             canvas.Children.Add(icon);

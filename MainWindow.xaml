@@ -1,12 +1,11 @@
 ﻿<Window x:Class="KinectPiPi.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:k="clr-namespace:Microsoft.Kinect.Toolkit;assembly=Microsoft.Kinect.Toolkit"
-        xmlns:c="clr-namespace:Microsoft.Kinect.Toolkit.Controls;assembly=Microsoft.Kinect.Toolkit.Controls"
+        xmlns:c="http://schemas.microsoft.com/kinect/2014"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         Title="Kinect拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
     <Window.Resources>
-        <Style x:Key="TileButtonStyle" TargetType="{x:Type c:KinectTileButton}">
+        <Style x:Key="TileButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="224"/>
             <Setter Property="Height" Value="126"/>
             <Setter Property="BorderBrush" Value="White"/>
@@ -29,7 +28,7 @@
             </Setter>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type c:KinectTileButton}">
+                    <ControlTemplate TargetType="{x:Type Button}">
                         <Grid>
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -74,13 +73,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="ImageButtonStyle" TargetType="{x:Type c:KinectTileButton}">
+        <Style x:Key="ImageButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="288"/>
             <Setter Property="Height" Value="162"/>
             <Setter Property="Margin" Value="10,0"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type c:KinectTileButton}">
+                    <ControlTemplate TargetType="{x:Type Button}">
                         <Grid Name="ButtonGrid" Background="{TemplateBinding Background}" RenderTransformOrigin="0.5,0.5">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -121,15 +120,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="ScrollViewerStyle" TargetType="{x:Type c:KinectScrollViewer}">
+        <Style x:Key="ScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
             <Setter Property="Height" Value="200"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="ContentMargin" Value="10"/>
-            <Setter Property="HoverBackground" Value="#7F505050"/>
             <Setter Property="HorizontalScrollBarVisibility" Value="Visible"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type c:KinectScrollViewer}">
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -140,16 +137,12 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Rectangle x:Name="scrollviewerBackground" Fill="{TemplateBinding Background}"/>
-                            <Rectangle x:Name="HoverBackground" Fill="{TemplateBinding HoverBackground}" Opacity="0"/>
                             <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
                             <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="True" CanVerticallyScroll="False" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0">
                                 <ScrollContentPresenter.Content>
                                     <ContentPresenter x:Name="PART_ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}">
                                         <ContentPresenter.Margin>
                                             <Binding ConverterParameter="TopBottomLeftRight" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                                <Binding.Converter>
-                                                    <c:DoubleToThicknessConverter/>
-                                                </Binding.Converter>
                                             </Binding>
                                         </ContentPresenter.Margin>
                                     </ContentPresenter>
@@ -293,9 +286,6 @@
                                 <Setter Property="Margin" TargetName="PART_ContentPresenter">
                                     <Setter.Value>
                                         <Binding ConverterParameter="TopBottom" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                            <Binding.Converter>
-                                                <c:DoubleToThicknessConverter/>
-                                            </Binding.Converter>
                                         </Binding>
                                     </Setter.Value>
                                 </Setter>
@@ -304,9 +294,6 @@
                                 <Setter Property="Margin" TargetName="PART_ContentPresenter">
                                     <Setter.Value>
                                         <Binding ConverterParameter="LeftRight" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                            <Binding.Converter>
-                                                <c:DoubleToThicknessConverter/>
-                                            </Binding.Converter>
                                         </Binding>
                                     </Setter.Value>
                                 </Setter>
@@ -420,11 +407,6 @@
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseIn"/>
@@ -432,11 +414,6 @@
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="AgainStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
@@ -473,63 +450,6 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-        <Storyboard x:Key="RestartStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5" BeginTime="0:0:0.25">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-60" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
-            <DoubleAnimation.EasingFunction>
-                <QuarticEase EasingMode="EaseOut"/>
-            </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="65" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5"  BeginTime="0:0:1">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="768" Duration="0:0:2" BeginTime="0:0:2">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="-768" To="0" Duration="0:0:2" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -564,11 +484,11 @@
                     </TextBlock>
                     <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
                 </Grid>
-                <c:KinectTileButton Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
-                    <c:KinectTileButton.RenderTransform>
+                <Button Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
+                    <Button.RenderTransform>
                         <TranslateTransform Y="500"/>
-                    </c:KinectTileButton.RenderTransform>
-                </c:KinectTileButton>
+                    </Button.RenderTransform>
+                </Button>
             </Grid>
             <Grid Name="Grid_MainPage" Background="Black">
                 <Grid.RenderTransform>
@@ -591,41 +511,41 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <c:KinectTileButton Grid.Column="0" Grid.Row="0" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource TileButtonStyle}" Click="Button_Screenshot_Click">
-                        <c:KinectTileButton.RenderTransform>
+                    <Button Grid.Column="0" Grid.Row="0" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource TileButtonStyle}" Click="Button_Screenshot_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
-                    <c:KinectTileButton  Grid.Column="0" Grid.Row="1" Name="Button_AddIcon" Content="新增貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_AddIcon_Click">
-                        <c:KinectTileButton.RenderTransform>
+                        </Button.RenderTransform>
+                    </Button>
+                    <Button  Grid.Column="0" Grid.Row="1" Name="Button_AddIcon" Content="新增貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_AddIcon_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
-                    <c:KinectTileButton  Grid.Column="0" Grid.Row="2" Name="Button_ClearIcon" Content="清除貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_ClearIcon_Click">
-                        <c:KinectTileButton.RenderTransform>
+                        </Button.RenderTransform>
+                    </Button>
+                    <Button  Grid.Column="0" Grid.Row="2" Name="Button_ClearIcon" Content="清除貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_ClearIcon_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
-                    <c:KinectTileButton  Grid.Column="0" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource TileButtonStyle}" Click="Button_Again_Click">
-                        <c:KinectTileButton.RenderTransform>
+                        </Button.RenderTransform>
+                    </Button>
+                    <Button  Grid.Column="0" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource TileButtonStyle}" Click="Button_Again_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform X="-300"/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
+                        </Button.RenderTransform>
+                    </Button>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources\CYCU0.jpg" Stretch="Fill"/>
-                    <Grid Grid.Column="1" Grid.RowSpan="3" Name="Grid_BackgroundRemoved"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill"/>
                     <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
-                    <Image Grid.Column="2" Name="Image_UserView" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
-                    <c:KinectTileButton  Grid.Column="2" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
-                        <c:KinectTileButton.RenderTransform>
+                    <Image Grid.Column="2" Name="Image_UserView" Source="{Binding BodyIndexImageSource}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <Button  Grid.Column="2" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
-                    <c:KinectTileButton  Grid.Column="2" Grid.Row="1" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
-                        <c:KinectTileButton.RenderTransform>
+                        </Button.RenderTransform>
+                    </Button>
+                    <Button  Grid.Column="2" Grid.Row="1" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
+                        <Button.RenderTransform>
                             <TranslateTransform X="300"/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
+                        </Button.RenderTransform>
+                    </Button>
                     <Image Grid.Column="2" Grid.Row="0" Name="Image_QrCode" Width="120" Height="120">
                         <Image.RenderTransform>
                             <TranslateTransform X="300"/>
@@ -636,15 +556,10 @@
                             <TranslateTransform X="300"/>
                         </Image.RenderTransform>
                     </Image>
-                    <c:KinectTileButton  Grid.Column="2" Grid.Row="2" Name="Button_Restart" Content="重新開始" Style="{DynamicResource TileButtonStyle}" Click="Button_Restart_Click">
-                        <c:KinectTileButton.RenderTransform>
-                            <TranslateTransform X="300"/>
-                        </c:KinectTileButton.RenderTransform>
-                    </c:KinectTileButton>
                 </Grid>
-                <c:KinectScrollViewer Grid.Row="2" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
+                <ScrollViewer Grid.Row="2" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
                     <WrapPanel Name="WrapPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </c:KinectScrollViewer>
+                </ScrollViewer>
                 <Grid Name="Grid_Opaque" Grid.Row="1" Grid.RowSpan="2" Background="#00000000" IsHitTestVisible="False">
                     <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
                     <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
