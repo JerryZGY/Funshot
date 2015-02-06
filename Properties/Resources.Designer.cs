@@ -59,5 +59,14 @@ namespace KinectPiPi.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查詢類似 將照片存至{0}時發生錯誤 的當地語系化字串。
+        /// </summary>
+        internal static string FailedSaveBitmapText {
+            get {
+                return ResourceManager.GetString("FailedSaveBitmapText", resourceCulture);
+            }
+        }
     }
 }

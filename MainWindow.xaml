@@ -312,39 +312,34 @@
             </Setter>
         </Style>
         <Storyboard x:Key="StartStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="0" Duration="0:0:1.5" BeginTime="0:0:1">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(Effect).(BlurEffect.Radius)" From="100.0" To="0" Duration="0:0:1.5" BeginTime="0:0:2.5">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:4">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-150" Duration="0:0:1" BeginTime="0:0:2.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-150" Duration="0:0:1" BeginTime="0:0:4.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:5.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:3.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="EnterMainPageStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-768" Duration="0:0:2">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="768" To="0" Duration="0:0:2">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -457,44 +452,9 @@
             </DoubleAnimation>
         </Storyboard>
     </Window.Resources>
-    <c:KinectRegion Name="KinectRegion">
+    <c:KinectRegion Name="KinectRegion" Background="Black">
         <Grid>
-            <Grid Name="Grid_StartPage">
-                <Grid.RenderTransform>
-                    <TranslateTransform/>
-                </Grid.RenderTransform>
-                <Image Name="Image_StartBackground" Source="Resources\CYCU8.jpg" Stretch="UniformToFill">
-                    <Image.Effect>
-                        <BlurEffect Radius="100"/>
-                    </Image.Effect>
-                </Image>
-                <Canvas Name="Canvas_EllipseAnimation" Opacity="0"/>
-                <Image Name="Image_StartForeground" Source="Resources/start.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.8">
-                    <Image.Effect>
-                        <BlurEffect Radius="100"/>
-                    </Image.Effect>
-                </Image>
-                <Grid Name="Grid_StartTitle" Opacity="0">
-                    <Grid.RenderTransform>
-                        <TranslateTransform/>
-                    </Grid.RenderTransform>
-                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="Purple">
-                        <TextBlock.Effect>
-                            <BlurEffect Radius="20" KernelType="Box"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
-                </Grid>
-                <Button Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
-                    <Button.RenderTransform>
-                        <TranslateTransform Y="500"/>
-                    </Button.RenderTransform>
-                </Button>
-            </Grid>
-            <Grid Name="Grid_MainPage" Background="Black">
-                <Grid.RenderTransform>
-                    <TranslateTransform Y="768"/>
-                </Grid.RenderTransform>
+            <Grid Name="Grid_MainPage" Background="Black" Opacity="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="144"/>
                     <RowDefinition Height="*"/>
@@ -532,7 +492,7 @@
                             <TranslateTransform X="-300"/>
                         </Button.RenderTransform>
                     </Button>
-                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources\CYCU0.jpg" Stretch="Fill"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources/Background/CYCU00.jpg" Stretch="Fill"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill"/>
                     <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
@@ -542,17 +502,17 @@
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="2" Grid.Row="1" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
+                    <Button  Grid.Column="2" Grid.Row="2" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
                         <Button.RenderTransform>
                             <TranslateTransform X="300"/>
                         </Button.RenderTransform>
                     </Button>
-                    <Image Grid.Column="2" Grid.Row="0" Name="Image_QrCode" Width="120" Height="120">
+                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="120" Height="120">
                         <Image.RenderTransform>
                             <TranslateTransform X="300"/>
                         </Image.RenderTransform>
                     </Image>
-                    <Image Grid.Column="2" Grid.Row="0" Name="Image_FBQrCode" Width="120" Height="120">
+                    <Image Grid.Column="2" Grid.Row="1" Name="Image_FBQrCode" Width="120" Height="120">
                         <Image.RenderTransform>
                             <TranslateTransform X="300"/>
                         </Image.RenderTransform>
@@ -565,6 +525,26 @@
                     <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
                     <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
                 </Grid>
+            </Grid>
+            <Grid Name="Grid_StartPage" Opacity="0">
+                <Image Name="Image_StartBackground" Source="Resources/Background/CYCU08.jpg" Stretch="UniformToFill"/>
+                <Image Name="Image_StartForeground" Source="Resources/start.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.8"/>
+                <Grid Name="Grid_StartTitle" Opacity="0">
+                    <Grid.RenderTransform>
+                        <TranslateTransform/>
+                    </Grid.RenderTransform>
+                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="Purple">
+                        <TextBlock.Effect>
+                            <BlurEffect Radius="20" KernelType="Box"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
+                </Grid>
+                <Button Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
+                    <Button.RenderTransform>
+                        <TranslateTransform Y="500"/>
+                    </Button.RenderTransform>
+                </Button>
             </Grid>
         </Grid>
     </c:KinectRegion>

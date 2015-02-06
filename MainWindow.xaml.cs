@@ -116,11 +116,9 @@ namespace KinectPiPi
 
         private Point mousePosition;
 
-        private EllipseGeometry[] ellipseGeometry = new EllipseGeometry[4];
+        private List<Button> backgroundButtonImageSource = new List<Button>();
 
-        private Button[] backgroundButtonImageSource = new Button[15];
-
-        private Button[] iconButtonImageSource = new Button[10];
+        private List<Button> iconButtonImageSource = new List<Button>();
 
         /// <summary>
         /// 捲軸選單是否可見
@@ -169,7 +167,17 @@ namespace KinectPiPi
             /*WebClient wc = new WebClient();
             //因為access_token會有過期失效問題，所以每次都重新取得access_token
             string result = wc.DownloadString("https://graph.facebook.com/oauth/access_token?client_id=330042973859060&client_secret=25cb17666efcaf603ae18eb46abc5950&scope=manage_notifications,manage_pages,publish_actions");
-            string access_token = result.Split('=')[1];*/
+            string access_token = result.Split('=')[1];
+            var fb = new FacebookClient();
+            dynamic result = fb.Get("oauth/access_token", new
+            {
+                client_id = "330042973859060",
+                client_secret = "25cb17666efcaf603ae18eb46abc5950",
+                grant_type = "client_credentials"
+            });
+            fb.AccessToken = result.access_token;
+            dynamic resultt = fb.Get("812796125441443");
+            var access_token = resultt.access_token;*/
 
             this.kinectSensor = KinectSensor.GetDefault();
 
@@ -206,43 +214,39 @@ namespace KinectPiPi
 
             var regionSensorBinding = new Binding("Kinect") { Source = this.kinectSensor };
             InitializeComponent();
-            for (var index = 0; index < 15; index++)
+            foreach (string fname in System.IO.Directory.GetFileSystemEntries(@"Resources/Background", "*.jpg"))
             {
                 var button = new Button
                 {
-                    Tag = index,
+                    Tag = fname,
                     Style = (Style)this.Resources["ImageButtonStyle"],
                     Background = new ImageBrush
                     {
-                        ImageSource = new BitmapImage(new Uri(@"Resources/CYCU" + index + ".jpg", UriKind.Relative)),
+                        ImageSource = new BitmapImage(new Uri(fname, UriKind.Relative)),
                         Stretch = Stretch.Uniform
                     }
                 };
                 button.Click += Button_Image_Click;
-                backgroundButtonImageSource[index] = button;
+                backgroundButtonImageSource.Add(button);
             }
-            for (var index = 0; index < 10; index++)
+            foreach (string fname in System.IO.Directory.GetFileSystemEntries(@"Resources/Icon", "*.png"))
             {
                 var button = new Button
                 {
-                    Tag = index,
+                    Tag = fname,
                     Style = (Style)this.Resources["ImageButtonStyle"],
                     Background = new ImageBrush
                     {
-                        ImageSource = new BitmapImage(new Uri(@"Resources/ICON" + index + ".png", UriKind.Relative)),
+                        ImageSource = new BitmapImage(new Uri(fname, UriKind.Relative)),
                         Stretch = Stretch.Uniform
                     }
                 };
                 button.Click += Button_Icon_Click;
-                iconButtonImageSource[index] = button;
+                iconButtonImageSource.Add(button);
             }
             BindingOperations.SetBinding(this.KinectRegion, KinectRegion.KinectSensorProperty, regionSensorBinding);
             this.updatePagingButtonState();
             ScrollViewer.ScrollChanged += (o, ev) => this.updatePagingButtonState();
-            for (int i = 0; i < 4; ++i)
-            {
-                createEllipse(i);
-            }
             beginStartStoryboard();
         }
 
@@ -422,7 +426,7 @@ namespace KinectPiPi
 
         private void postToFacebook (byte[] filebytes)
         {
-            var access_token = "CAAEsLB43rPQBAEQcHhfX57ategObOZAyrwzZCWKOFgJWZA4MvOqt6ZBWIZBUaAhhyfSygZB7xjB6oLlWFgTsroRy2sKZCKH8nJLkFAWXdOh9qoLIaijpsi14frUkIg3ug5U4ZAZBlZBVnmiAAr9XmBbo0JOPjU1q3vSmiZAuxblpBNVLYR7CrEx2z15S9nPlCOZCZBlxelYpbRpkTywZDZD";
+            var access_token = "CAAEsLB43rPQBABmSsrP2XfrGGMYvdQIpM5F0QhNN79VW4CJhsGQL43oQjvSrldM3xZClS0amynVDUGe3zSx50cIOOnEJFbnZBeuiuNhYGS4OqZCpFHNqGZCW37aDm1GhV07dXYX12a7jhf2QxgOAZAfdxbmPH458RPk1lkZBoO54pudvhVIqCB";
             FacebookClient fb = new FacebookClient(access_token);
             FacebookMediaObject media = new FacebookMediaObject();
             media.ContentType = "image/jpeg";
@@ -440,170 +444,24 @@ namespace KinectPiPi
             catch (Exception) { }
         }
 
-        /*private void OnHandPointerLeave (object sender, PointerEventArgs e)
-        {
-            if (draggedImage != null)
-            {
-                isGripinInteraction = false;
-                Panel.SetZIndex(draggedImage, 0);
-                draggedImage = null;
-            }
-        }
-        
-        private void OnHandPointerMove (object sender, HandPointerEventArgs e)
-        {
-            if (draggedImage != null)
-            {
-                var position = e.HandPointer.GetPosition(canvas);
-                var offset = position - mousePosition;
-                mousePosition = position;
-                var X = Canvas.GetLeft(draggedImage) + offset.X;
-                if (X < 0)
-                    X = 0;
-                if (X > canvas.ActualWidth - draggedImage.ActualWidth)
-                    X = canvas.ActualWidth - draggedImage.ActualWidth;
-                var Y = Canvas.GetTop(draggedImage) + offset.Y;
-                if (Y < 0)
-                    Y = 0;
-                if (Y > canvas.ActualHeight - draggedImage.ActualHeight)
-                    Y = canvas.ActualHeight - draggedImage.ActualHeight;
-                Canvas.SetLeft(draggedImage, X);
-                Canvas.SetTop(draggedImage, Y);
-            }
-        }
-
-        private void OnQuery (object sender, QueryInteractionStatusEventArgs handPointerEventArgs)
-        {
-            if (handPointerEventArgs.HandPointer.HandEventType == HandEventType.Grip)
-            {
-                var image = handPointerEventArgs.Source as Image;
-                if (image != null)
-                {
-                    isGripinInteraction = true;
-                    handPointerEventArgs.IsInGripInteraction = true;
-                    mousePosition = handPointerEventArgs.HandPointer.GetPosition(canvas);
-                    draggedImage = image;
-                    Panel.SetZIndex(draggedImage, 1);
-                }
-            }
-            else if (handPointerEventArgs.HandPointer.HandEventType == HandEventType.GripRelease)
-            {
-                if (draggedImage != null)
-                {
-                    isGripinInteraction = false;
-                    handPointerEventArgs.IsInGripInteraction = false;
-                    Panel.SetZIndex(draggedImage, 0);
-                    draggedImage = null;
-                }
-            }
-            else if (handPointerEventArgs.HandPointer.HandEventType == HandEventType.None)
-            {
-                handPointerEventArgs.IsInGripInteraction = isGripinInteraction;
-            }
-            handPointerEventArgs.Handled = true;
-        }*/
-
         private void beginStartStoryboard ()
         {
             Storyboard storyBoard = (Storyboard)this.Resources["StartStoryboard"];
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Image_StartForeground);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_StartBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Grid_StartPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Grid_StartTitle);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Grid_StartTitle);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Grid_StartTitle);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Start);
             storyBoard.Completed += storyBoard_Completed;
             storyBoard.Begin();
         }
 
-        void storyBoard_Completed (object sender, EventArgs e)
+        private void storyBoard_Completed (object sender, EventArgs e)
         {
             foreach (var button in backgroundButtonImageSource)
             {
                 WrapPanel.Children.Add(button);
             }
-            DoubleAnimation canvasFadeInAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromSeconds(2),
-                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-            };
-            Storyboard canvasAnimationstoryBoard = new Storyboard();
-            Storyboard.SetTargetName(canvasFadeInAnimation, "Canvas_EllipseAnimation");
-            Storyboard.SetTargetProperty(canvasFadeInAnimation, new PropertyPath(Canvas.OpacityProperty));
-            canvasAnimationstoryBoard.Children.Add(canvasFadeInAnimation);
-            canvasAnimationstoryBoard.Begin(Canvas_EllipseAnimation);
             Button_Start.IsHitTestVisible = true;
-        }
-
-        private void createEllipse (int index)
-        {
-            var randomX = new Random(index * new Random(index).Next(0, 10000)).Next(341, 684);
-            var randomY = new Random(index * new Random(index).Next(0, 10000)).Next(185, 370);
-            if (new Random(index).Next(0, 2) == 0)
-                createEllipse(index, new Point(randomX, randomY), new Point(randomX, 0));
-            else
-                createEllipse(index, new Point(randomX, randomY), new Point(randomX, 739));
-        }
-
-        private void createEllipse (int index, Point from, Point to)
-        {
-            Storyboard myStoryboard = new Storyboard();
-            ellipseGeometry[index] = new EllipseGeometry();
-            EllipseGeometry thisEllipseGeometry = ellipseGeometry[index];
-            var hashCode = thisEllipseGeometry.GetHashCode();
-            var hashCodeString = "E" + hashCode.ToString();
-            var randomRadius = new Random(thisEllipseGeometry.GetHashCode()).Next(15, 31);
-            thisEllipseGeometry.Center = from;
-            thisEllipseGeometry.RadiusX = randomRadius;
-            thisEllipseGeometry.RadiusY = randomRadius;
-            this.RegisterName(hashCodeString, thisEllipseGeometry);
-            System.Windows.Shapes.Path myPath = new System.Windows.Shapes.Path()
-            {
-                Name = "myPath" + index,
-                Fill = Brushes.White,
-                Data = thisEllipseGeometry
-            };
-
-            Canvas_EllipseAnimation.Children.Add(myPath);
-            PointAnimation myPointAnimation = new PointAnimation
-            {
-                From = from,
-                To = to,
-                Duration = TimeSpan.FromSeconds(new Random(hashCode).Next(22, 28) * 0.1),
-                //EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseInOut }
-            };
-            Storyboard.SetTargetName(myPointAnimation, hashCodeString);
-            Storyboard.SetTargetProperty(myPointAnimation, new PropertyPath(EllipseGeometry.CenterProperty));
-            myStoryboard.Children.Add(myPointAnimation);
-            EventHandler handler = null;
-            handler = (s, e) =>
-            {
-                if (null == ellipseGeometry)
-                {
-                    myStoryboard.Completed -= handler;
-                    return;
-                }
-                myStoryboard_Completed(s, e, index);
-            };
-            myStoryboard.Completed += handler;
-            myStoryboard.Begin(myPath);
-        }
-
-        private void myStoryboard_Completed (object sender, EventArgs e, int index)
-        {
-            EllipseGeometry thisEllipseGeometry = ellipseGeometry[index];
-            var hashCode = thisEllipseGeometry.GetHashCode();
-            var ellipseGeometryPosition = thisEllipseGeometry.Center;
-            var circle = (UIElement)LogicalTreeHelper.FindLogicalNode(Canvas_EllipseAnimation, "myPath" + index) as System.Windows.Shapes.Path;
-            Canvas_EllipseAnimation.Children.Remove(circle);
-            this.UnregisterName("E" + hashCode.ToString());
-            var randomX = new Random(hashCode).Next(0, 1367);
-            var randomY = new Random(hashCode).Next(0, 740);
-            if (ellipseGeometryPosition.Y >= ( 700 - thisEllipseGeometry.RadiusX ))
-                createEllipse(index, ellipseGeometryPosition, new Point(randomX, 0));
-            else
-                createEllipse(index, ellipseGeometryPosition, new Point(randomX, 739));
         }
 
         private void Button_Start_Click (object sender, RoutedEventArgs e)
@@ -617,8 +475,6 @@ namespace KinectPiPi
             storyBoard.Completed += (se, ev) =>
             {
                 Grid_StartPage.Visibility = Visibility.Collapsed;
-                ellipseGeometry = null;
-                Canvas_EllipseAnimation.Children.Clear();
                 Image_BackgroundRemoval.Visibility = Visibility.Visible;
                 Image_UserView.Visibility = Visibility.Visible;
             };
@@ -774,11 +630,50 @@ namespace KinectPiPi
             }
             renderBitmap.Render(dv);
             Image_Result.Source = renderBitmap;
+            saveBitmapToLocal(renderBitmap);
             var resultBitmap = convertImageToByte(renderBitmap);
-            drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
             drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_FBQrCode);
             await Task.Run(() => postToFacebook(resultBitmap));
+            //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
             beginShowResultStoryboard();
+        }
+
+        private void saveBitmapToLocal (RenderTargetBitmap renderBitmap)
+        {
+            BitmapEncoder encoder = new JpegBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+            string time = System.DateTime.Now.ToString("yyyy'-'MM'-'dd'-'hh'-'mm'-'ss");
+            string dirPath = @"Photo";
+            string path = System.IO.Path.Combine(@"Photo/", "KinectPiPi-" + time + ".jpg");
+            if (Directory.Exists(dirPath))
+            {
+                try
+                {
+                    using (FileStream fs = new FileStream(path, FileMode.Create))
+                    {
+                        encoder.Save(fs);
+                    }
+                }
+                catch (IOException)
+                {
+                    string.Format(Properties.Resources.FailedSaveBitmapText, path);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(dirPath);
+                try
+                {
+                    using (FileStream fs = new FileStream(path, FileMode.Create))
+                    {
+                        encoder.Save(fs);
+                    }
+                }
+                catch (IOException)
+                {
+                    string.Format(Properties.Resources.FailedSaveBitmapText, path);
+                }
+            }  
         }
 
         private void drawQrCode (string text, Image image)
@@ -875,7 +770,7 @@ namespace KinectPiPi
         private void Button_Image_Click (object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            Image_Background.Source = new BitmapImage(new Uri("Resources/CYCU" + button.Tag as string + ".jpg", UriKind.Relative));
+            Image_Background.Source = new BitmapImage(new Uri(button.Tag as string, UriKind.Relative));
         }
 
         private void Button_AddIcon_Click (object sender, RoutedEventArgs e)
@@ -902,7 +797,7 @@ namespace KinectPiPi
         private void Button_Icon_Click (object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            ImageSource source = new BitmapImage(new Uri(@"Resources/ICON" + button.Tag as string + ".png", UriKind.Relative));
+            ImageSource source = new BitmapImage(new Uri(button.Tag as string, UriKind.Relative));
             var icon = new DraggableElement();
             icon.Child = new Image { Source = source };
             Canvas.SetLeft(icon, canvas.ActualWidth / 2 - source.Width / 2);
@@ -913,12 +808,15 @@ namespace KinectPiPi
         private void CanvasMouseLeftButtonDown (object sender, MouseButtonEventArgs e)
         {
             var image = e.Source as Image;
-            var draggableElement = image.Parent as DraggableElement;
-            if (draggableElement != null && canvas.CaptureMouse())
+            if (image != null)
             {
-                mousePosition = e.GetPosition(canvas);
-                draggedElement = draggableElement;
-                Panel.SetZIndex(draggedElement, 1);
+                var draggableElement = image.Parent as DraggableElement;
+                if (draggableElement != null && canvas.CaptureMouse())
+                {
+                    mousePosition = e.GetPosition(canvas);
+                    draggedElement = draggableElement;
+                    Panel.SetZIndex(draggedElement, 1);
+                }
             }
         }
 

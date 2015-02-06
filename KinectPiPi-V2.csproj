@@ -141,87 +141,83 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\CYCU0.jpg">
+    <Content Include="Resources\Background\CYCU00.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU1.jpg">
+    <Content Include="Resources\Background\CYCU01.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU10.jpg">
+    <Content Include="Resources\Background\CYCU10.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU11.jpg">
+    <Content Include="Resources\Background\CYCU11.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU12.jpg">
+    <Content Include="Resources\Background\CYCU12.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU13.jpg">
+    <Content Include="Resources\Background\CYCU13.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU14.jpg">
+    <Content Include="Resources\Background\CYCU14.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU2.jpg">
+    <Content Include="Resources\Background\CYCU02.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU3.jpg">
+    <Content Include="Resources\Background\CYCU03.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU4.jpg">
+    <Content Include="Resources\Background\CYCU04.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU5.jpg">
+    <Content Include="Resources\Background\CYCU05.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU6.jpg">
+    <Content Include="Resources\Background\CYCU06.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU7.jpg">
+    <Content Include="Resources\Background\CYCU07.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU8.jpg">
+    <Content Include="Resources\Background\CYCU08.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\CYCU9.jpg">
+    <Content Include="Resources\Background\CYCU09.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\header.png">
+    <Resource Include="Resources\header.png" />
+    <Content Include="Resources\Icon\ICON00.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON0.png">
+    <Content Include="Resources\Icon\ICON01.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON1.png">
+    <Content Include="Resources\Icon\ICON02.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON2.png">
+    <Content Include="Resources\Icon\ICON03.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON3.png">
+    <Content Include="Resources\Icon\ICON04.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON4.png">
+    <Content Include="Resources\Icon\ICON05.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON5.png">
+    <Content Include="Resources\Icon\ICON06.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON6.png">
+    <Content Include="Resources\Icon\ICON07.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON7.png">
+    <Content Include="Resources\Icon\ICON08.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON8.png">
+    <Content Include="Resources\Icon\ICON09.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\ICON9.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\start.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Resources\start.png" />
     <Resource Include="Resources\Kinect.ico" />
   </ItemGroup>
   <ItemGroup />
