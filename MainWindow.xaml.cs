@@ -91,11 +91,6 @@ namespace KinectPiPi
         };
 
         /// <summary>
-        /// Reader for body index frames
-        /// </summary>
-        private BodyIndexFrameReader bodyIndexFrameReader = null;
-
-        /// <summary>
         /// Description of the data contained in the body index frame
         /// </summary>
         private FrameDescription bodyIndexFrameDescription = null;
@@ -117,7 +112,7 @@ namespace KinectPiPi
 
         private const double scrollErrorMargin = 0.001;
 
-        private Image draggedImage;
+        private DraggableElement draggedElement;
 
         private Point mousePosition;
 
@@ -445,7 +440,7 @@ namespace KinectPiPi
             catch (Exception) { }
         }
 
-        /*private void OnHandPointerLeave (object sender, HandPointerEventArgs e)
+        /*private void OnHandPointerLeave (object sender, PointerEventArgs e)
         {
             if (draggedImage != null)
             {
@@ -657,45 +652,6 @@ namespace KinectPiPi
                 this.kinectSensor = null;
             }
         }
-
-        /// <summary>
-        /// 繪製使用者識別區圖像
-        /// </summary>
-        /// <param name="depthFrame">新的深度影像</param>
-        /*private void updateUserView (DepthImageFrame depthFrame)
-        {
-            if (null == this.depthData || this.depthData.Length != depthFrame.PixelDataLength)
-            {
-                this.depthData = new DepthImagePixel[depthFrame.PixelDataLength];
-            }
-            depthFrame.CopyDepthImagePixelDataTo(this.depthData);
-            int width = depthFrame.Width;
-            int height = depthFrame.Height;
-            if (null == this.userViewBitmap || this.userViewBitmap.PixelWidth != width || this.userViewBitmap.PixelHeight != height)
-            {
-                this.userViewBitmap = new WriteableBitmap(width, height, 96.0, 96.0, PixelFormats.Bgra32, null);
-                this.Image_UserView.Source = this.userViewBitmap;
-            }
-            this.userViewBitmap.Lock();
-            unsafe
-            {
-                uint* userViewBits = (uint*)this.userViewBitmap.BackBuffer;
-                fixed (uint* userColors = &this.userColors[0])
-                {
-                    fixed (DepthImagePixel* depthData = &this.depthData[0])
-                    {
-                        DepthImagePixel* depthPixel = depthData;
-                        DepthImagePixel* depthPixelEnd = depthPixel + this.depthData.Length;
-                        while (depthPixel < depthPixelEnd)
-                        {
-                            *( userViewBits++ ) = *( userColors + ( depthPixel++ )->PlayerIndex );
-                        }
-                    }
-                }
-            }
-            this.userViewBitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
-            this.userViewBitmap.Unlock();
-        }*/
 
         private void Button_Screenshot_Click (object sender, RoutedEventArgs e)
         {
@@ -946,57 +902,55 @@ namespace KinectPiPi
         private void Button_Icon_Click (object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            var icon = new Image { Source = new BitmapImage(new Uri(@"Resources/ICON" + button.Tag as string + ".png", UriKind.Relative)) };
-            /*KinectRegion.AddQueryInteractionStatusHandler(icon, OnQuery);
-            KinectRegion.AddHandPointerLeaveHandler(icon, OnHandPointerLeave);
-            KinectRegion.AddHandPointerMoveHandler(icon, OnHandPointerMove);
-            KinectRegion.SetIsGripTarget(icon, true);*/
-            Canvas.SetLeft(icon, canvas.ActualWidth / 2 - icon.Source.Width / 2);
-            Canvas.SetTop(icon, canvas.ActualHeight / 2 - icon.Source.Height / 2);
+            ImageSource source = new BitmapImage(new Uri(@"Resources/ICON" + button.Tag as string + ".png", UriKind.Relative));
+            var icon = new DraggableElement();
+            icon.Child = new Image { Source = source };
+            Canvas.SetLeft(icon, canvas.ActualWidth / 2 - source.Width / 2);
+            Canvas.SetTop(icon, canvas.ActualHeight / 2 - source.Height / 2);
             canvas.Children.Add(icon);
         }
 
         private void CanvasMouseLeftButtonDown (object sender, MouseButtonEventArgs e)
         {
             var image = e.Source as Image;
-
-            if (image != null && canvas.CaptureMouse())
+            var draggableElement = image.Parent as DraggableElement;
+            if (draggableElement != null && canvas.CaptureMouse())
             {
                 mousePosition = e.GetPosition(canvas);
-                draggedImage = image;
-                Panel.SetZIndex(draggedImage, 1);
+                draggedElement = draggableElement;
+                Panel.SetZIndex(draggedElement, 1);
             }
         }
 
         private void CanvasMouseLeftButtonUp (object sender, MouseButtonEventArgs e)
         {
-            if (draggedImage != null)
+            if (draggedElement != null)
             {
                 canvas.ReleaseMouseCapture();
-                Panel.SetZIndex(draggedImage, 0);
-                draggedImage = null;
+                Panel.SetZIndex(draggedElement, 0);
+                draggedElement = null;
             }
         }
 
         private void CanvasMouseMove (object sender, MouseEventArgs e)
         {
-            if (draggedImage != null)
+            if (draggedElement != null)
             {
                 var position = e.GetPosition(canvas);
                 var offset = position - mousePosition;
                 mousePosition = position;
-                var X = Canvas.GetLeft(draggedImage) + offset.X;
+                var X = Canvas.GetLeft(draggedElement) + offset.X;
                 if (X < 0)
                     X = 0;
-                if (X > canvas.ActualWidth - draggedImage.ActualWidth)
-                    X = canvas.ActualWidth - draggedImage.ActualWidth;
-                var Y = Canvas.GetTop(draggedImage) + offset.Y;
+                if (X > canvas.ActualWidth - draggedElement.ActualWidth)
+                    X = canvas.ActualWidth - draggedElement.ActualWidth;
+                var Y = Canvas.GetTop(draggedElement) + offset.Y;
                 if (Y < 0)
                     Y = 0;
-                if (Y > canvas.ActualHeight - draggedImage.ActualHeight)
-                    Y = canvas.ActualHeight - draggedImage.ActualHeight;
-                Canvas.SetLeft(draggedImage, X);
-                Canvas.SetTop(draggedImage, Y);
+                if (Y > canvas.ActualHeight - draggedElement.ActualHeight)
+                    Y = canvas.ActualHeight - draggedElement.ActualHeight;
+                Canvas.SetLeft(draggedElement, X);
+                Canvas.SetTop(draggedElement, Y);
             }
         }
 
