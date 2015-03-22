@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -110,6 +109,16 @@ namespace KinectPiPi
         /// </summary>
         private WriteableBitmap bodyIndexBitmap = null;
 
+        private String accessToken = "";
+
+        private System.Windows.Forms.Timer idleCountdownTimer = new System.Windows.Forms.Timer() { Interval = 1000 };
+
+        private System.Windows.Forms.Timer screenShotCountdownTimer = new System.Windows.Forms.Timer() { Interval = 1000 };
+
+        private Int32 idleCountdownTimes;
+
+        private Int32 screenShotCountdownTimes;
+
         private const double scrollErrorMargin = 0.001;
 
         private DraggableElement draggedElement;
@@ -126,6 +135,8 @@ namespace KinectPiPi
         private bool scrollViewerVisible = false;
 
         private bool isBackgroundScrollViewer = true;
+
+        private bool isShotted = false;
 
         /// <summary>
         /// Size of the RGB pixel in the bitmap
@@ -164,23 +175,14 @@ namespace KinectPiPi
 
         public MainWindow ()
         {
-            /*WebClient wc = new WebClient();
-            //因為access_token會有過期失效問題，所以每次都重新取得access_token
-            string result = wc.DownloadString("https://graph.facebook.com/oauth/access_token?client_id=330042973859060&client_secret=25cb17666efcaf603ae18eb46abc5950&scope=manage_notifications,manage_pages,publish_actions");
-            string access_token = result.Split('=')[1];
-            var fb = new FacebookClient();
-            dynamic result = fb.Get("oauth/access_token", new
-            {
-                client_id = "330042973859060",
-                client_secret = "25cb17666efcaf603ae18eb46abc5950",
-                grant_type = "client_credentials"
-            });
-            fb.AccessToken = result.access_token;
-            dynamic resultt = fb.Get("812796125441443");
-            var access_token = resultt.access_token;*/
+            idleCountdownTimer.Tick += idleCountdownTimer_Tick;
+
+            screenShotCountdownTimer.Tick += screenShotCountdownTimer_Tick;
+
+            accessToken = System.IO.File.ReadAllText(@"AccessToken.actkn");
 
             this.kinectSensor = KinectSensor.GetDefault();
-
+            
             this.multiFrameSourceReader = this.kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Depth | FrameSourceTypes.Color | FrameSourceTypes.BodyIndex);
 
             this.multiFrameSourceReader.MultiSourceFrameArrived += this.Reader_MultiSourceFrameArrived;
@@ -248,6 +250,61 @@ namespace KinectPiPi
             this.updatePagingButtonState();
             ScrollViewer.ScrollChanged += (o, ev) => this.updatePagingButtonState();
             beginStartStoryboard();
+        }
+
+        private void screenShotCountdownTimer_Tick (object sender, EventArgs e)
+        {
+            if (screenShotCountdownTimes > 0)
+            {
+                Label_Counter.Content = screenShotCountdownTimes.ToString();
+                screenShotCountdownTimes--;
+            }
+            else
+            {
+                Label_Counter.Content = "";
+                screenShotCountdownTimer.Stop();
+                saveBitmap();
+            }
+        }
+
+        private void idleCountdownTimer_Tick (object sender, EventArgs e)
+        {
+            if (idleCountdownTimes > 0)
+            {
+                Label_IdleCounter.Content = idleCountdownTimes.ToString();
+                idleCountdownTimes--;
+            }
+            else
+            {
+                if (!isShotted)
+                {
+                    Label_IdleCounter.Content = "";
+                    idleCountdownTimer.Stop();
+                    beginRestartStoryboard();
+                }
+                else
+                {
+                    Label_IdleCounter.Content = "";
+                    idleCountdownTimer.Stop();
+                    Button_Again_ClickEvent(isTimerCall:true);
+                    isShotted = false;
+                }
+            }
+        }
+
+        private void idleCountdownTimer_Reset ()
+        {
+            Label_IdleCounter.Content = "10";
+            idleCountdownTimer.Stop();
+            idleCountdownTimes = 10;
+            idleCountdownTimer.Enabled = true;
+        }
+
+        private void idleCountdownTimer_Stop ()
+        {
+            Label_IdleCounter.Content = "";
+            idleCountdownTimer.Stop();
+            idleCountdownTimer.Enabled = false;
         }
 
         /// <summary>
@@ -424,24 +481,36 @@ namespace KinectPiPi
                 0);
         }
 
-        private void postToFacebook (byte[] filebytes)
+        private async Task postToFacebook (byte[] filebytes)
         {
-            var access_token = "CAAEsLB43rPQBAJHeg0R3XgqFxtDjVMu0ZCNsJwoPJQJLMS2aaP3Cic1e9RZB1lRKNrhmPMNdRZArZBkwysCV2U0LeR7XfZAZCaFVdwEtvtOC3njfYQV9BKEZC0cEdLJAOZCPdceEoZBMyjnyHtqgpmVzSMGittjmkhFxY9GHK6eMtmFseJBPx4nrBZAUh2k4V89sZB7tGs4H1VHyAZDZD";
-            FacebookClient fb = new FacebookClient(access_token);
+            FacebookClient fb = new FacebookClient();
+            fb.AccessToken = this.accessToken;
+            dynamic result = fb.Get("oauth/access_token", new
+            {
+                client_id = "330042973859060",
+                client_secret = "25cb17666efcaf603ae18eb46abc5950",
+                grant_type = "fb_exchange_token",
+                fb_exchange_token = fb.AccessToken
+            });
+            fb.AccessToken = result.access_token;
+            byte[] encodedText = Encoding.UTF8.GetBytes(fb.AccessToken);
+            using (var sourceStream = new FileStream("AccessToken.actkn", FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+            {
+                await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
+            }
             FacebookMediaObject media = new FacebookMediaObject();
             media.ContentType = "image/jpeg";
             media.FileName = "test.jpg";
             media.SetValue(filebytes);
             Dictionary<string, object> upload = new Dictionary<string, object>();
-            upload.Add("message", "Kinect拍拍熱騰騰的相片哦！");
             upload.Add("no_story", "1");
-            upload.Add("access_token", access_token);
+            upload.Add("access_token", fb.AccessToken);
             upload.Add("@file.jpg", media);
-            try
-            {
-                fb.Post("/764952110260957" + "/photos", upload);
-            }
-            catch (Exception) { }
+            /*try
+            {*/
+                await fb.PostTaskAsync("/764952110260957" + "/photos", upload);
+            /*}
+            catch (Exception) { }*/
         }
 
         private void beginStartStoryboard ()
@@ -451,6 +520,33 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Start);
             storyBoard.Completed += storyBoard_Completed;
             storyBoard.Begin();
+        }
+
+        private void beginRestartStoryboard ()
+        {
+            if (scrollViewerVisible)
+            {
+                setBackgroundPanelVisible(false);
+                setIconPanelVisible(false);
+            }
+            scrollViewerVisible = false;
+            Grid_StartPage.Visibility = Visibility.Visible;
+            Grid_MainPage.IsHitTestVisible = false;
+            Storyboard storyBoard = (Storyboard)this.Resources["RestartStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_BackgroundRemoval);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_UserView);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Grid_MainPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Grid_StartPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Start);
+            storyBoard.Completed += (se, ev) =>
+            {
+                Grid_MainPage.Visibility = Visibility.Collapsed;
+                Grid_StartPage.IsHitTestVisible = true;
+                Image_Background.Source = new BitmapImage(new Uri(@"Resources/Background/CYCU00.jpg", UriKind.Relative));
+            };
+            storyBoard.Begin();
+            canvas.Children.Clear();
         }
 
         private void storyBoard_Completed (object sender, EventArgs e)
@@ -464,17 +560,24 @@ namespace KinectPiPi
 
         private void Button_Start_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
+            var isOver = false;
+            Grid_StartPage.IsHitTestVisible = false;
             scrollViewerVisible = false;
             Grid_MainPage.Visibility = Visibility.Visible;
             Grid_MainPage.IsHitTestVisible = true;
             Storyboard storyBoard = (Storyboard)this.Resources["EnterMainPageStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Grid_StartPage);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Grid_MainPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_BackgroundRemoval);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_UserView);
             storyBoard.Completed += (se, ev) =>
             {
-                Grid_StartPage.Visibility = Visibility.Collapsed;
-                Image_BackgroundRemoval.Visibility = Visibility.Visible;
-                Image_UserView.Visibility = Visibility.Visible;
+                if (!isOver)
+                {
+                    Grid_StartPage.Visibility = Visibility.Collapsed;
+                    isOver = true;
+                }
             };
             storyBoard.Begin();
         }
@@ -509,6 +612,8 @@ namespace KinectPiPi
 
         private void Button_Screenshot_Click (object sender, RoutedEventArgs e)
         {
+            isShotted = true;
+            idleCountdownTimer_Stop();
             if (scrollViewerVisible)
             {
                 setBackgroundPanelVisible(false);
@@ -517,26 +622,8 @@ namespace KinectPiPi
             Grid_Opaque.IsHitTestVisible = true;
             Label_Counter.Content = "5";
             beginCountdownStoryboard();
-            Timer countdownTimer = new Timer(1000);
-            var count = 4;
-            countdownTimer.Elapsed += (s, ev) =>
-            {
-                countdownTimer.Stop();
-                if (count == 0)
-                {
-                    countdownTimer.Enabled = false;
-                    countdownTimer.Stop();
-                    Dispatcher.BeginInvoke(new Action<string>(CounterUpdate), "");
-                    Dispatcher.BeginInvoke(new Action(saveBitmap));
-                }
-                else
-                {
-                    Dispatcher.BeginInvoke(new Action<string>(CounterUpdate), count.ToString());
-                    count--;
-                    countdownTimer.Start();
-                }
-            };
-            countdownTimer.Enabled = true;
+            screenShotCountdownTimes = 4;
+            screenShotCountdownTimer.Start();
         }
 
         private void setBackgroundPanelVisible (bool visible)
@@ -605,11 +692,6 @@ namespace KinectPiPi
             storyBoard.Begin();
         }
 
-        private void CounterUpdate (string count)
-        {
-            Label_Counter.Content = count;
-        }
-
         private async void saveBitmap ()
         {
             BitmapSource source = Image_Background.Source as BitmapSource;
@@ -628,11 +710,11 @@ namespace KinectPiPi
             }
             renderBitmap.Render(dv);
             Image_Result.Source = renderBitmap;
-            saveBitmapToLocal(renderBitmap);
+            //saveBitmapToLocal(renderBitmap);
             var resultBitmap = convertImageToByte(renderBitmap);
-            //drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_FBQrCode);
+            drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_QrCode);
             //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
-            //await Task.Run(() => postToFacebook(resultBitmap));
+            await postToFacebook(resultBitmap);
             beginShowResultStoryboard();
         }
 
@@ -679,8 +761,8 @@ namespace KinectPiPi
             QrEncoder qrEncoder = new QrEncoder(ErrorCorrectionLevel.M);
             QrCode qrCode;
             qrEncoder.TryEncode(text, out qrCode);
-            WriteableBitmap wBitmap = new WriteableBitmap(120, 120, 96, 96, PixelFormats.Gray8, null);
-            new WriteableBitmapRenderer(new FixedModuleSize(2, QuietZoneModules.Two)).Draw(wBitmap, qrCode.Matrix);
+            WriteableBitmap wBitmap = new WriteableBitmap(135, 135, 96, 96, PixelFormats.Gray8, null);
+            new WriteableBitmapRenderer(new FixedModuleSize(3, QuietZoneModules.Two)).Draw(wBitmap, qrCode.Matrix);
             image.Source = wBitmap;
         }
 
@@ -714,6 +796,8 @@ namespace KinectPiPi
 
         private void beginShowResultStoryboard ()
         {
+            idleCountdownTimer_Reset();
+            Image_QrCode.Visibility = System.Windows.Visibility.Visible;
             Storyboard storyBoard = (Storyboard)this.Resources["ShowResultStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_ChangeBackground);
@@ -721,14 +805,14 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Screenshot);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_ClearIcon);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_Again);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_Again);
             storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = false; Grid_Opaque.IsHitTestVisible = false; };
             storyBoard.Begin();
         }
 
         private void Button_ChangeBackground_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
             if (scrollViewerVisible && !isBackgroundScrollViewer)
             {
                 setIconPanelVisible(false);
@@ -748,29 +832,56 @@ namespace KinectPiPi
                 setBackgroundPanelVisible(true);
         }
 
-        private void Button_Again_Click(object sender, RoutedEventArgs e)
+        private void Button_Again_ClickEvent (bool isTimerCall)
         {
+            Grid_MainPage.IsHitTestVisible = false;
+            var isOver = false;
+            Image_Result.Source = null;
+            canvas.Children.Clear();
             Storyboard storyBoard = (Storyboard)this.Resources["AgainStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Again);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_ChangeBackground);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_ClearIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_Screenshot);
-            storyBoard.Begin();
-            Image_Result.Source = null;
-            canvas.Children.Clear();
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_AddIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_ClearIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Screenshot);
+            if(!isTimerCall)
+            {
+                idleCountdownTimer_Reset();
+                storyBoard.Completed += (s, ev) => { Image_QrCode.Visibility = System.Windows.Visibility.Collapsed; Grid_MainPage.IsHitTestVisible = true; };
+                storyBoard.Begin();
+            }
+            else
+            {
+                idleCountdownTimer_Stop();
+                storyBoard.Completed += (s, ev) =>
+                {
+                    if (!isOver)
+                    {
+                        Image_QrCode.Visibility = System.Windows.Visibility.Collapsed;
+                        beginRestartStoryboard();
+                        isOver = true;
+                    }
+                };
+                storyBoard.Begin();
+            }
+        }
+
+        private void Button_Again_Click(object sender, RoutedEventArgs e)
+        {
+            Button_Again_ClickEvent(isTimerCall: false);
         }
 
         private void Button_Image_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
             Button button = (Button)sender;
             Image_Background.Source = new BitmapImage(new Uri(button.Tag as string, UriKind.Relative));
         }
 
         private void Button_AddIcon_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
             if (scrollViewerVisible && isBackgroundScrollViewer)
             {
                 setBackgroundPanelVisible(false);
@@ -792,6 +903,7 @@ namespace KinectPiPi
 
         private void Button_Icon_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
             Button button = (Button)sender;
             ImageSource source = new BitmapImage(new Uri(button.Tag as string, UriKind.Relative));
             var icon = new DraggableElement();
@@ -850,13 +962,8 @@ namespace KinectPiPi
 
         private void Button_ClearIcon_Click (object sender, RoutedEventArgs e)
         {
+            idleCountdownTimer_Reset();
             canvas.Children.Clear();
-        }
-
-        private void Button_BrowseFanPage_Click (object sender, RoutedEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream"));
-            e.Handled = true;
         }
     }
 }

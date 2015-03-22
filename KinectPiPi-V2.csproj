@@ -41,7 +41,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Kinect.ico</ApplicationIcon>
+    <ApplicationIcon>Kinect-V2.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Facebook">
@@ -60,6 +60,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\MahApps.Metro.1.0.1-ALPHA027\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -141,6 +142,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Kinect-V2.ico" />
     <Content Include="Resources\Background\CYCU00.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -186,19 +188,20 @@
     <Content Include="Resources\Background\CYCU09.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Kinect-V2.ico" />
     <Resource Include="Resources\bottom.png" />
-    <Resource Include="Resources\Element\leftButton_Hover.png" />
+    <Resource Include="Resources\Element\leftButton_MouseOver.png" />
     <Resource Include="Resources\Element\leftButton_Normal.png" />
-    <Resource Include="Resources\Element\leftButton_Select.png" />
+    <Resource Include="Resources\Element\leftButton_Pressed.png" />
     <Resource Include="Resources\lefter.png" />
-    <Resource Include="Resources\Element\rightButton_Hover.png" />
+    <Resource Include="Resources\Element\rightButton_MouseOver.png" />
     <Resource Include="Resources\Element\rightButton_Normal.png" />
-    <Resource Include="Resources\Element\rightButton_Select.png" />
+    <Resource Include="Resources\Element\rightButton_Pressed.png" />
     <Resource Include="Resources\righter.png" />
     <Resource Include="Resources\start.png" />
-    <Resource Include="Resources\Element\startButton_Hover.png" />
+    <Resource Include="Resources\Element\startButton_MouseOver.png" />
     <Resource Include="Resources\Element\startButton_Normal.png" />
-    <Resource Include="Resources\Element\startButton_Select.png" />
+    <Resource Include="Resources\Element\startButton_Pressed.png" />
     <Content Include="Resources\Icon\ICON00.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -229,7 +232,6 @@
     <Content Include="Resources\Icon\ICON09.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\Kinect.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

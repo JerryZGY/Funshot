@@ -4,7 +4,7 @@
         xmlns:c="http://schemas.microsoft.com/kinect/2014"
         xmlns:Custom="clr-namespace:KinectPiPi"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="中原大拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
+        Title="樂拍機" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
     <Window.Resources>
         <Style x:Key="StartButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="224"/>
@@ -13,33 +13,69 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush ImageSource="Resources/Element/startButton_Normal.png"/>
-                </Setter.Value>
-            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/startButton_Hover.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/startButton_Select.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                        <Grid Name="ButtonGrid" RenderTransformOrigin="0.5,0.5">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.States>
+                                        <VisualState Name="Normal">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="Pressed">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="0.9" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="0.9" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PressedBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1.1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1.1" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MouseOverBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup.States>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid.RenderTransform>
+                                <ScaleTransform/>
+                            </Grid.RenderTransform>
+                            <Image x:Name="NormalBackground" Source="Resources/Element/startButton_Normal.png" Visibility="Visible"/>
+                            <Image x:Name="PressedBackground" Source="Resources/Element/startButton_Pressed.png" Visibility="Collapsed"/>
+                            <Image x:Name="MouseOverBackground" Source="Resources/Element/startButton_MouseOver.png" Visibility="Collapsed"/>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -55,33 +91,72 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontFamily" Value="Microsoft JhengHei"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush ImageSource="Resources/Element/leftButton_Normal.png"/>
-                </Setter.Value>
-            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.States>
+                                        <VisualState Name="Normal">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="Pressed">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="0.9" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="0.9" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PressedBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1.1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1.1" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MouseOverBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup.States>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid Name="ButtonGrid" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <ScaleTransform/>
+                                </Grid.RenderTransform>
+                                <Image x:Name="NormalBackground" Source="Resources/Element/leftButton_Normal.png" Visibility="Visible"/>
+                                <Image x:Name="PressedBackground" Source="Resources/Element/leftButton_Pressed.png" Visibility="Collapsed"/>
+                                <Image x:Name="MouseOverBackground" Source="Resources/Element/leftButton_MouseOver.png" Visibility="Collapsed"/>
+                            </Grid>
                             <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/leftButton_Hover.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/leftButton_Select.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -97,33 +172,72 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontFamily" Value="Microsoft JhengHei"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <ImageBrush ImageSource="Resources/Element/rightButton_Normal.png"/>
-                </Setter.Value>
-            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.States>
+                                        <VisualState Name="Normal">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="Pressed">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="0.9" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="0.9" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PressedBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1.1" Duration="0:0:0.1"/>
+                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1.1" Duration="0:0:0.1"/>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="NormalBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Collapsed</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MouseOverBackground" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <Visibility>Visible</Visibility>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup.States>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid Name="ButtonGrid" RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <ScaleTransform/>
+                                </Grid.RenderTransform>
+                                <Image x:Name="NormalBackground" Source="Resources/Element/rightButton_Normal.png" Visibility="Visible"/>
+                                <Image x:Name="PressedBackground" Source="Resources/Element/rightButton_Pressed.png" Visibility="Collapsed"/>
+                                <Image x:Name="MouseOverBackground" Source="Resources/Element/rightButton_MouseOver.png" Visibility="Collapsed"/>
+                            </Grid>
                             <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/rightButton_Hover.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <ImageBrush ImageSource="Resources/Element/rightButton_Select.png"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                        </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -371,7 +485,7 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:2">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="520" To="100" Duration="0:0:1" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -384,6 +498,16 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -432,34 +556,24 @@
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="-60" Duration="0:0:0.5" BeginTime="0:0:1">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:1">
                 <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseIn"/>
+                    <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="65" Duration="0:0:0.5" BeginTime="0:0:1">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="AgainStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-60" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="65" To="300" Duration="0:0:0.5" BeginTime="0:0:0.5">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1" BeginTime="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -485,10 +599,38 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+        <Storyboard x:Key="RestartStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" To="520"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1" BeginTime="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:3">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Window.Resources>
     <c:KinectRegion Name="KinectRegion" Background="Black">
         <Grid>
-            <Grid Name="Grid_MainPage" Background="Black" Opacity="1">
+            <Grid Name="Grid_MainPage" Background="Black" Opacity="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
@@ -521,49 +663,41 @@
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
+                    <Button Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource LeftButtonStyle}" Click="Button_Again_Click">
+                        <Button.RenderTransform>
+                            <TranslateTransform X="-300"/>
+                        </Button.RenderTransform>
+                    </Button>
                     <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_Background" Source="Resources/Background/CYCU00.jpg" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0"/>
                     <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
                     <Image Grid.RowSpan="3" Grid.Column="2" Source="Resources/righter.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
                     <Viewbox Grid.Column="2" Height="135" Width="230">
-                        <Image Grid.Column="2" Name="Image_UserView" Source="{Binding BodyIndexImageSource}" Stretch="UniformToFill" Visibility="Collapsed"/>
+                        <Image Grid.Column="2" Name="Image_UserView" Source="{Binding BodyIndexImageSource}" Stretch="UniformToFill" Opacity="0"/>
                     </Viewbox>
                     <Button Grid.Column="2" Grid.Row="1" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource RightButtonStyle}" Click="Button_Screenshot_Click">
                         <Button.RenderTransform>
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="2" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource RightButtonStyle}" Click="Button_Again_Click">
-                        <Button.RenderTransform>
-                            <TranslateTransform X="300"/>
-                        </Button.RenderTransform>
-                    </Button>
-                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="120" Height="120">
-                        <Image.RenderTransform>
-                            <TranslateTransform X="300"/>
-                        </Image.RenderTransform>
-                    </Image>
-                    <Image Grid.Column="2" Grid.Row="1" Name="Image_FBQrCode" Width="120" Height="120">
-                        <Image.RenderTransform>
-                            <TranslateTransform X="300"/>
-                        </Image.RenderTransform>
-                    </Image>
+                    <Label Grid.Column="2" Grid.Row="2" Name="Label_IdleCounter" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="48" FontWeight="Bold"/>
+                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="135" Height="135" Opacity="0"/>
                     <Image Grid.Row="3" Grid.ColumnSpan="3" Source="Resources/bottom.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
                 </Grid>
                 <ScrollViewer Grid.Row="1" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
                     <WrapPanel Name="WrapPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </ScrollViewer>
-                <Grid Name="Grid_Opaque" Grid.Row="0" Background="#00000000" IsHitTestVisible="False">
+                <Grid Name="Grid_Opaque" Grid.ColumnSpan="3" Grid.RowSpan="3" Background="#00000000" IsHitTestVisible="False">
                     <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
                     <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
                 </Grid>
             </Grid>
             <Grid Name="Grid_StartPage" Opacity="0">
-                <Image Name="Image_StartBackground" Source="Resources/start.png" Stretch="UniformToFill"/>
+                <Image Name="Image_StartBackground" Source="Resources/start.png" Stretch="Fill"/>
                 <Button Name="Button_Start" Style="{DynamicResource StartButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click" Width="200" Height="290">
                     <Button.RenderTransform>
-                        <TranslateTransform Y="500"/>
+                        <TranslateTransform Y="520"/>
                     </Button.RenderTransform>
                 </Button>
             </Grid>
