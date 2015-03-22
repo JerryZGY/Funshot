@@ -426,7 +426,7 @@ namespace KinectPiPi
 
         private void postToFacebook (byte[] filebytes)
         {
-            var access_token = "CAAEsLB43rPQBABmSsrP2XfrGGMYvdQIpM5F0QhNN79VW4CJhsGQL43oQjvSrldM3xZClS0amynVDUGe3zSx50cIOOnEJFbnZBeuiuNhYGS4OqZCpFHNqGZCW37aDm1GhV07dXYX12a7jhf2QxgOAZAfdxbmPH458RPk1lkZBoO54pudvhVIqCB";
+            var access_token = "CAAEsLB43rPQBAJHeg0R3XgqFxtDjVMu0ZCNsJwoPJQJLMS2aaP3Cic1e9RZB1lRKNrhmPMNdRZArZBkwysCV2U0LeR7XfZAZCaFVdwEtvtOC3njfYQV9BKEZC0cEdLJAOZCPdceEoZBMyjnyHtqgpmVzSMGittjmkhFxY9GHK6eMtmFseJBPx4nrBZAUh2k4V89sZB7tGs4H1VHyAZDZD";
             FacebookClient fb = new FacebookClient(access_token);
             FacebookMediaObject media = new FacebookMediaObject();
             media.ContentType = "image/jpeg";
@@ -448,9 +448,7 @@ namespace KinectPiPi
         {
             Storyboard storyBoard = (Storyboard)this.Resources["StartStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Grid_StartPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Grid_StartTitle);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Grid_StartTitle);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Start);
             storyBoard.Completed += storyBoard_Completed;
             storyBoard.Begin();
         }
@@ -632,9 +630,9 @@ namespace KinectPiPi
             Image_Result.Source = renderBitmap;
             saveBitmapToLocal(renderBitmap);
             var resultBitmap = convertImageToByte(renderBitmap);
-            drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_FBQrCode);
-            await Task.Run(() => postToFacebook(resultBitmap));
+            //drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_FBQrCode);
             //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
+            //await Task.Run(() => postToFacebook(resultBitmap));
             beginShowResultStoryboard();
         }
 
@@ -688,7 +686,7 @@ namespace KinectPiPi
 
         private async Task<HttpWebRequest> postImageHttpWebRequsetAsync (byte[] image)
         {
-            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("http://140.135.113.20/kinect/get.php");
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create("http://127.0.0.1/kinect/get.php");
             byte[] bs = Encoding.ASCII.GetBytes(@"img=data:image/jpeg;base64," + Convert.ToBase64String(image));
             req.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
             req.Method = "POST";
@@ -701,7 +699,7 @@ namespace KinectPiPi
         private async Task<string> getImageUrlAsync (HttpWebRequest req)
         {
             WebResponse response = await req.GetResponseAsync();
-            string imageAddress = @"http://140.135.113.20/kinect/index.php?img=" + new StreamReader(response.GetResponseStream()).ReadToEnd();
+            string imageAddress = @"http://127.0.0.1/kinect/index.php?img=" + new StreamReader(response.GetResponseStream()).ReadToEnd();
             return imageAddress;
         }
 
@@ -718,14 +716,13 @@ namespace KinectPiPi
         {
             Storyboard storyBoard = (Storyboard)this.Resources["ShowResultStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Screenshot);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_ChangeBackground);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Screenshot);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_ClearIcon);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Image_QrCode);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_BrowseFanPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(8) as DoubleAnimation, Button_Again);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_Again);
             storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = false; Grid_Opaque.IsHitTestVisible = false; };
             storyBoard.Begin();
         }
@@ -755,13 +752,12 @@ namespace KinectPiPi
         {
             Storyboard storyBoard = (Storyboard)this.Resources["AgainStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Again);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_BrowseFanPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_FBQrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_Screenshot);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_ClearIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_QrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_FBQrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_AddIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_ClearIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_Screenshot);
             storyBoard.Begin();
             Image_Result.Source = null;
             canvas.Children.Clear();

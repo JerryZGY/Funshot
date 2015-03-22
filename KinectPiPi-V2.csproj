@@ -186,7 +186,19 @@
     <Content Include="Resources\Background\CYCU09.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\header.png" />
+    <Resource Include="Resources\bottom.png" />
+    <Resource Include="Resources\Element\leftButton_Hover.png" />
+    <Resource Include="Resources\Element\leftButton_Normal.png" />
+    <Resource Include="Resources\Element\leftButton_Select.png" />
+    <Resource Include="Resources\lefter.png" />
+    <Resource Include="Resources\Element\rightButton_Hover.png" />
+    <Resource Include="Resources\Element\rightButton_Normal.png" />
+    <Resource Include="Resources\Element\rightButton_Select.png" />
+    <Resource Include="Resources\righter.png" />
+    <Resource Include="Resources\start.png" />
+    <Resource Include="Resources\Element\startButton_Hover.png" />
+    <Resource Include="Resources\Element\startButton_Normal.png" />
+    <Resource Include="Resources\Element\startButton_Select.png" />
     <Content Include="Resources\Icon\ICON00.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -217,7 +229,6 @@
     <Content Include="Resources\Icon\ICON09.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\start.png" />
     <Resource Include="Resources\Kinect.ico" />
   </ItemGroup>
   <ItemGroup />

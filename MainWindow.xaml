@@ -4,72 +4,126 @@
         xmlns:c="http://schemas.microsoft.com/kinect/2014"
         xmlns:Custom="clr-namespace:KinectPiPi"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="Kinect拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
+        Title="中原大拍拍" Width="1366" Height="768" MaxWidth="1366" MaxHeight="768" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="windowClosing">
     <Window.Resources>
-        <Style x:Key="TileButtonStyle" TargetType="{x:Type Button}">
+        <Style x:Key="StartButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="224"/>
             <Setter Property="Height" Value="126"/>
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="26"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontFamily" Value="FangSong"/>
             <Setter Property="Background">
                 <Setter.Value>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" ColorInterpolationMode="ScRgbLinearInterpolation">
-                        <GradientStop Color="#FF511C74"/>
-                        <GradientStop Color="#FF311040" Offset="1"/>
-                    </LinearGradientBrush>
+                    <ImageBrush ImageSource="Resources/Element/startButton_Normal.png"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Grid>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualStateGroup.States>
-                                        <VisualState Name="Normal">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
-                                    To="1" Duration="0:0:0.1"/>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
-                                    To="1" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState Name="Pressed">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
-                                To="0.9" Duration="0:0:0.1"/>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
-                                To="0.9" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState Name="MouseOver">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
-                                   To="1.1" Duration="0:0:0.1"/>
-                                                <DoubleAnimation Storyboard.TargetName="ButtonGrid" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
-                                   To="1.1" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup.States>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <Grid Name="ButtonGrid" RenderTransformOrigin="0.5,0.5">
-                                <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                                </Border>
-                                <Grid.RenderTransform>
-                                    <ScaleTransform/>
-                                </Grid.RenderTransform>
-                            </Grid>
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Grid>
+                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/startButton_Hover.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/startButton_Select.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LeftButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="224"/>
+            <Setter Property="Height" Value="126"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="35"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Microsoft JhengHei"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="Resources/Element/leftButton_Normal.png"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/leftButton_Hover.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/leftButton_Select.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="RightButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="224"/>
+            <Setter Property="Height" Value="126"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="35"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Microsoft JhengHei"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="Resources/Element/rightButton_Normal.png"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/rightButton_Hover.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="Resources/Element/rightButton_Select.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -317,17 +371,7 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="0" To="-150" Duration="0:0:1" BeginTime="0:0:2.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:3.5">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:2">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -403,19 +447,9 @@
                     <QuarticEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="AgainStoryboard">
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="-300" Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5" BeginTime="0:0:0.25">
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="0" To="300" Duration="0:0:0.5">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -454,55 +488,53 @@
     </Window.Resources>
     <c:KinectRegion Name="KinectRegion" Background="Black">
         <Grid>
-            <Grid Name="Grid_MainPage" Background="Black" Opacity="0">
+            <Grid Name="Grid_MainPage" Background="Black" Opacity="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="144"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Image Grid.Row="0" Source="Resources/header.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
-                <Grid Grid.Row="1" Grid.RowSpan="2">
+                <Grid Grid.Row="0" Grid.RowSpan="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="786"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="144"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Column="0" Grid.Row="0" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource TileButtonStyle}" Click="Button_Screenshot_Click">
+                    <Image Grid.Row="0" Grid.RowSpan="3" Source="Resources/lefter.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
+                    <Button  Grid.Column="0" Grid.Row="0" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource LeftButtonStyle}" Click="Button_ChangeBackground_Click">
                         <Button.RenderTransform>
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="0" Grid.Row="1" Name="Button_AddIcon" Content="新增貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_AddIcon_Click">
+                    <Button  Grid.Column="0" Grid.Row="1" Name="Button_AddIcon" Content="新增貼圖" Style="{DynamicResource LeftButtonStyle}" Click="Button_AddIcon_Click">
                         <Button.RenderTransform>
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="0" Grid.Row="2" Name="Button_ClearIcon" Content="清除貼圖" Style="{DynamicResource TileButtonStyle}" Click="Button_ClearIcon_Click">
+                    <Button  Grid.Column="0" Grid.Row="2" Name="Button_ClearIcon" Content="清除貼圖" Style="{DynamicResource LeftButtonStyle}" Click="Button_ClearIcon_Click">
                         <Button.RenderTransform>
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="0" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource TileButtonStyle}" Click="Button_Again_Click">
-                        <Button.RenderTransform>
-                            <TranslateTransform X="-300"/>
-                        </Button.RenderTransform>
-                    </Button>
-                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Background" Source="Resources/Background/CYCU00.jpg" Stretch="Fill"/>
-                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_Background" Source="Resources/Background/CYCU00.jpg" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
-                    <Image Grid.Column="2" Name="Image_UserView" Source="{Binding BodyIndexImageSource}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
-                    <Button  Grid.Column="2" Grid.Row="1" Name="Button_ChangeBackground" Content="更換背景" Style="{DynamicResource TileButtonStyle}" Click="Button_ChangeBackground_Click">
+                    <Image Grid.RowSpan="3" Grid.Column="2" Source="Resources/righter.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
+                    <Viewbox Grid.Column="2" Height="135" Width="230">
+                        <Image Grid.Column="2" Name="Image_UserView" Source="{Binding BodyIndexImageSource}" Stretch="UniformToFill" Visibility="Collapsed"/>
+                    </Viewbox>
+                    <Button Grid.Column="2" Grid.Row="1" Name="Button_Screenshot" Content="拍攝照片" Style="{DynamicResource RightButtonStyle}" Click="Button_Screenshot_Click">
                         <Button.RenderTransform>
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button  Grid.Column="2" Grid.Row="2" Name="Button_BrowseFanPage" Content="瀏覽專頁" Style="{DynamicResource TileButtonStyle}" Click="Button_BrowseFanPage_Click">
+                    <Button  Grid.Column="2" Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource RightButtonStyle}" Click="Button_Again_Click">
                         <Button.RenderTransform>
                             <TranslateTransform X="300"/>
                         </Button.RenderTransform>
@@ -517,30 +549,19 @@
                             <TranslateTransform X="300"/>
                         </Image.RenderTransform>
                     </Image>
+                    <Image Grid.Row="3" Grid.ColumnSpan="3" Source="Resources/bottom.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
                 </Grid>
-                <ScrollViewer Grid.Row="2" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
+                <ScrollViewer Grid.Row="1" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
                     <WrapPanel Name="WrapPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </ScrollViewer>
-                <Grid Name="Grid_Opaque" Grid.Row="1" Grid.RowSpan="2" Background="#00000000" IsHitTestVisible="False">
+                <Grid Name="Grid_Opaque" Grid.Row="0" Background="#00000000" IsHitTestVisible="False">
                     <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
                     <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
                 </Grid>
             </Grid>
             <Grid Name="Grid_StartPage" Opacity="0">
-                <Image Name="Image_StartBackground" Source="Resources/Background/CYCU08.jpg" Stretch="UniformToFill"/>
-                <Image Name="Image_StartForeground" Source="Resources/start.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" Opacity="0.8"/>
-                <Grid Name="Grid_StartTitle" Opacity="0">
-                    <Grid.RenderTransform>
-                        <TranslateTransform/>
-                    </Grid.RenderTransform>
-                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="Purple">
-                        <TextBlock.Effect>
-                            <BlurEffect Radius="20" KernelType="Box"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                    <TextBlock Text="KINECT 拍拍" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="130" Foreground="White"/>
-                </Grid>
-                <Button Name="Button_Start"  Content="開始拍拍" Style="{DynamicResource TileButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click">
+                <Image Name="Image_StartBackground" Source="Resources/start.png" Stretch="UniformToFill"/>
+                <Button Name="Button_Start" Style="{DynamicResource StartButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click" Width="200" Height="290">
                     <Button.RenderTransform>
                         <TranslateTransform Y="500"/>
                     </Button.RenderTransform>
