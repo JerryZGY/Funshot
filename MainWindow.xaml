@@ -485,7 +485,12 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="520" To="100" Duration="0:0:1" BeginTime="0:0:2">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:2">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="520" To="100" Duration="0:0:1" BeginTime="0:0:3">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -601,6 +606,11 @@
         </Storyboard>
         <Storyboard x:Key="RestartStoryboard">
             <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" To="520"/>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
@@ -621,7 +631,12 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:3">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:3">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.Y)" From="500" To="100" Duration="0:0:1" BeginTime="0:0:4">
                 <DoubleAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
                 </DoubleAnimation.EasingFunction>
@@ -669,7 +684,7 @@
                         </Button.RenderTransform>
                     </Button>
                     <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_Background" Source="Resources/Background/CYCU00.jpg" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Image Grid.Column="1" Grid.RowSpan="3" Height="600" Width="800" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0"/>
+                    <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_BackgroundRemoval" Source="{Binding ImageSource}" Stretch="Fill" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0"/>
                     <Canvas Grid.Column="1" Grid.RowSpan="3" Name ="canvas" Background="Transparent" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                     <Image Grid.Column="1" Grid.RowSpan="3" Name ="Image_Result" Stretch="Fill"/>
                     <Image Grid.RowSpan="3" Grid.Column="2" Source="Resources/righter.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
@@ -681,7 +696,7 @@
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Label Grid.Column="2" Grid.Row="2" Name="Label_IdleCounter" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="48" FontWeight="Bold"/>
+                    <Label Grid.Column="2" Grid.Row="2" Name="Label_IdleCounter" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontSize="48" FontWeight="Bold" Margin="0,5,15,0"/>
                     <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="135" Height="135" Opacity="0"/>
                     <Image Grid.Row="3" Grid.ColumnSpan="3" Source="Resources/bottom.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
                 </Grid>
@@ -695,7 +710,8 @@
             </Grid>
             <Grid Name="Grid_StartPage" Opacity="0">
                 <Image Name="Image_StartBackground" Source="Resources/start.png" Stretch="Fill"/>
-                <Button Name="Button_Start" Style="{DynamicResource StartButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click" Width="200" Height="290">
+                <Image Name="Image_Title" Source="Resources/title.png" Stretch="Uniform" Width="630" Height="353" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,35,0,0" Opacity="0"/>
+                <Button Name="Button_Start" Style="{DynamicResource StartButtonStyle}" IsHitTestVisible="False" Click="Button_Start_Click" Width="180" Height="260">
                     <Button.RenderTransform>
                         <TranslateTransform Y="520"/>
                     </Button.RenderTransform>

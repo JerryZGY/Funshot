@@ -142,6 +142,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\title.png" />
     <Resource Include="Kinect-V2.ico" />
     <Content Include="Resources\Background\CYCU00.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

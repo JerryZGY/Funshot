@@ -287,16 +287,15 @@ namespace KinectPiPi
                     Label_IdleCounter.Content = "";
                     idleCountdownTimer.Stop();
                     Button_Again_ClickEvent(isTimerCall:true);
-                    isShotted = false;
                 }
             }
         }
 
         private void idleCountdownTimer_Reset ()
         {
-            Label_IdleCounter.Content = "10";
+            Label_IdleCounter.Content = "20";
             idleCountdownTimer.Stop();
-            idleCountdownTimes = 10;
+            idleCountdownTimes = 20;
             idleCountdownTimer.Enabled = true;
         }
 
@@ -517,7 +516,8 @@ namespace KinectPiPi
         {
             Storyboard storyBoard = (Storyboard)this.Resources["StartStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Grid_StartPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_Title);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_Start);
             storyBoard.Completed += storyBoard_Completed;
             storyBoard.Begin();
         }
@@ -534,11 +534,13 @@ namespace KinectPiPi
             Grid_MainPage.IsHitTestVisible = false;
             Storyboard storyBoard = (Storyboard)this.Resources["RestartStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Button_Start);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_BackgroundRemoval);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_UserView);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Grid_MainPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Grid_StartPage);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Start);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Image_Title);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Image_BackgroundRemoval);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Image_UserView);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Grid_MainPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Grid_StartPage);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Image_Title);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_Start);
             storyBoard.Completed += (se, ev) =>
             {
                 Grid_MainPage.Visibility = Visibility.Collapsed;
@@ -834,6 +836,7 @@ namespace KinectPiPi
 
         private void Button_Again_ClickEvent (bool isTimerCall)
         {
+            isShotted = false;
             Grid_MainPage.IsHitTestVisible = false;
             var isOver = false;
             Image_Result.Source = null;
