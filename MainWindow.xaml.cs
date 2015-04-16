@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -502,12 +503,16 @@ namespace KinectPiPi
             media.FileName = "test.jpg";
             media.SetValue(filebytes);
             Dictionary<string, object> upload = new Dictionary<string, object>();
-            upload.Add("no_story", "1");
+            upload.Add("message", "樂拍機測試");
+            //upload.Add("no_story", "1");
             upload.Add("access_token", fb.AccessToken);
             upload.Add("@file.jpg", media);
             /*try
             {*/
-                await fb.PostTaskAsync("/764952110260957" + "/photos", upload);
+                //樂學園
+                await fb.PostTaskAsync("/535820436458616" + "/photos", upload);
+                //Kinect拍拍
+                //await fb.PostTaskAsync("/764952110260957" + "/photos", upload);
             /*}
             catch (Exception) { }*/
         }
@@ -524,6 +529,7 @@ namespace KinectPiPi
 
         private void beginRestartStoryboard ()
         {
+            var isOver = false;
             if (scrollViewerVisible)
             {
                 setBackgroundPanelVisible(false);
@@ -543,9 +549,14 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_Start);
             storyBoard.Completed += (se, ev) =>
             {
-                Grid_MainPage.Visibility = Visibility.Collapsed;
-                Grid_StartPage.IsHitTestVisible = true;
-                Image_Background.Source = new BitmapImage(new Uri(@"Resources/Background/CYCU00.jpg", UriKind.Relative));
+                if (!isOver)
+                {
+                    beginTitleEffectStoryboard();
+                    Grid_MainPage.Visibility = Visibility.Collapsed;
+                    Grid_StartPage.IsHitTestVisible = true;
+                    Image_Background.Source = new BitmapImage(new Uri(@"Resources/Background/CYCU00.jpg", UriKind.Relative));
+                    isOver = true;
+                }
             };
             storyBoard.Begin();
             canvas.Children.Clear();
@@ -553,11 +564,19 @@ namespace KinectPiPi
 
         private void storyBoard_Completed (object sender, EventArgs e)
         {
+            beginTitleEffectStoryboard();
             foreach (var button in backgroundButtonImageSource)
             {
                 WrapPanel.Children.Add(button);
             }
             Button_Start.IsHitTestVisible = true;
+        }
+
+        private void beginTitleEffectStoryboard ()
+        {
+            Storyboard storyBoard = (Storyboard)this.Resources["TitleEffectStoryboard"];
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, Image_Title);
+            storyBoard.Begin();
         }
 
         private void Button_Start_Click (object sender, RoutedEventArgs e)
@@ -716,7 +735,14 @@ namespace KinectPiPi
             var resultBitmap = convertImageToByte(renderBitmap);
             drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_QrCode);
             //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
-            await postToFacebook(resultBitmap);
+            if (new Ping().Send("graph.facebook.com").Status == IPStatus.Success)
+            {
+                await postToFacebook(resultBitmap);
+            }
+            else
+            {
+
+            }
             beginShowResultStoryboard();
         }
 
@@ -927,6 +953,7 @@ namespace KinectPiPi
                     mousePosition = e.GetPosition(canvas);
                     draggedElement = draggableElement;
                     Panel.SetZIndex(draggedElement, 1);
+                    idleCountdownTimer_Reset();
                 }
             }
         }

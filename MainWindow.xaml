@@ -642,6 +642,9 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+        <Storyboard x:Key="TitleEffectStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.2" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever"/>
+        </Storyboard>
     </Window.Resources>
     <c:KinectRegion Name="KinectRegion" Background="Black">
         <Grid>
