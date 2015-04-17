@@ -120,6 +120,8 @@ namespace KinectPiPi
 
         private Int32 screenShotCountdownTimes;
 
+        private byte[] resultBitmap;
+
         private const double scrollErrorMargin = 0.001;
 
         private DraggableElement draggedElement;
@@ -183,7 +185,7 @@ namespace KinectPiPi
             accessToken = System.IO.File.ReadAllText(@"AccessToken.actkn");
 
             this.kinectSensor = KinectSensor.GetDefault();
-            
+
             this.multiFrameSourceReader = this.kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Depth | FrameSourceTypes.Color | FrameSourceTypes.BodyIndex);
 
             this.multiFrameSourceReader.MultiSourceFrameArrived += this.Reader_MultiSourceFrameArrived;
@@ -260,11 +262,21 @@ namespace KinectPiPi
                 Label_Counter.Content = screenShotCountdownTimes.ToString();
                 screenShotCountdownTimes--;
             }
-            else
+            else if (screenShotCountdownTimes == 0)
             {
                 Label_Counter.Content = "";
-                screenShotCountdownTimer.Stop();
+                screenShotCountdownTimes--;
                 saveBitmap();
+            }
+            else
+            {
+                screenShotCountdownTimer.Stop();
+                try
+                {
+                    postToFacebook(resultBitmap);
+                }
+                catch (Exception) { }
+                beginShowResultStoryboard();
             }
         }
 
@@ -287,16 +299,16 @@ namespace KinectPiPi
                 {
                     Label_IdleCounter.Content = "";
                     idleCountdownTimer.Stop();
-                    Button_Again_ClickEvent(isTimerCall:true);
+                    Button_Again_ClickEvent(isTimerCall: true);
                 }
             }
         }
 
         private void idleCountdownTimer_Reset ()
         {
-            Label_IdleCounter.Content = "20";
+            Label_IdleCounter.Content = "60";
             idleCountdownTimer.Stop();
-            idleCountdownTimes = 20;
+            idleCountdownTimes = 60;
             idleCountdownTimer.Enabled = true;
         }
 
@@ -481,11 +493,11 @@ namespace KinectPiPi
                 0);
         }
 
-        private async Task postToFacebook (byte[] filebytes)
+        private async void postToFacebook (byte[] filebytes)
         {
             FacebookClient fb = new FacebookClient();
             fb.AccessToken = this.accessToken;
-            dynamic result = fb.Get("oauth/access_token", new
+            dynamic result = await fb.GetTaskAsync("oauth/access_token", new
             {
                 client_id = "330042973859060",
                 client_secret = "25cb17666efcaf603ae18eb46abc5950",
@@ -504,17 +516,13 @@ namespace KinectPiPi
             media.SetValue(filebytes);
             Dictionary<string, object> upload = new Dictionary<string, object>();
             upload.Add("message", "樂拍機測試");
-            //upload.Add("no_story", "1");
+            upload.Add("no_story", "1");
             upload.Add("access_token", fb.AccessToken);
             upload.Add("@file.jpg", media);
-            /*try
-            {*/
-                //樂學園
-                await fb.PostTaskAsync("/535820436458616" + "/photos", upload);
-                //Kinect拍拍
-                //await fb.PostTaskAsync("/764952110260957" + "/photos", upload);
-            /*}
-            catch (Exception) { }*/
+            //樂學園
+            await fb.PostTaskAsync("/535820436458616" + "/photos", upload);
+            //Kinect拍拍
+            //await fb.PostTaskAsync("/764952110260957" + "/photos", upload);
         }
 
         private void beginStartStoryboard ()
@@ -705,15 +713,23 @@ namespace KinectPiPi
 
         private void beginCountdownStoryboard ()
         {
+            var isOver = false;
             Storyboard storyBoard = (Storyboard)this.Resources["CountdownStoryboard"];
             Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as ColorAnimation, Grid_Opaque);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as ColorAnimation, Grid_Opaque);
-            storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = true; };
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, ProgressRing);
+            storyBoard.Completed += (se, ev) =>
+            {
+                if (!isOver)
+                {
+                    isOver = true;
+                }
+            };
             storyBoard.Begin();
         }
 
-        private async void saveBitmap ()
+        private void saveBitmap ()
         {
             BitmapSource source = Image_Background.Source as BitmapSource;
             int colorWidth = Convert.ToInt32(Image_Background.ActualWidth);
@@ -732,18 +748,9 @@ namespace KinectPiPi
             renderBitmap.Render(dv);
             Image_Result.Source = renderBitmap;
             //saveBitmapToLocal(renderBitmap);
-            var resultBitmap = convertImageToByte(renderBitmap);
-            drawQrCode("https://www.facebook.com/pages/Kinect%E6%8B%8D%E6%8B%8D/764952110260957?sk=photos_stream", Image_QrCode);
+            resultBitmap = convertImageToByte(renderBitmap);
+            drawQrCode("https://www.facebook.com/CYCUstudent.club", Image_QrCode);
             //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
-            if (new Ping().Send("graph.facebook.com").Status == IPStatus.Success)
-            {
-                await postToFacebook(resultBitmap);
-            }
-            else
-            {
-
-            }
-            beginShowResultStoryboard();
         }
 
         private void saveBitmapToLocal (RenderTargetBitmap renderBitmap)
@@ -781,7 +788,7 @@ namespace KinectPiPi
                 {
                     string.Format(Properties.Resources.FailedSaveBitmapText, path);
                 }
-            }  
+            }
         }
 
         private void drawQrCode (string text, Image image)
@@ -789,7 +796,7 @@ namespace KinectPiPi
             QrEncoder qrEncoder = new QrEncoder(ErrorCorrectionLevel.M);
             QrCode qrCode;
             qrEncoder.TryEncode(text, out qrCode);
-            WriteableBitmap wBitmap = new WriteableBitmap(135, 135, 96, 96, PixelFormats.Gray8, null);
+            WriteableBitmap wBitmap = new WriteableBitmap(99, 99, 96, 96, PixelFormats.Gray8, null);
             new WriteableBitmapRenderer(new FixedModuleSize(3, QuietZoneModules.Two)).Draw(wBitmap, qrCode.Matrix);
             image.Source = wBitmap;
         }
@@ -827,14 +834,15 @@ namespace KinectPiPi
             idleCountdownTimer_Reset();
             Image_QrCode.Visibility = System.Windows.Visibility.Visible;
             Storyboard storyBoard = (Storyboard)this.Resources["ShowResultStoryboard"];
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as ColorAnimation, Grid_Opaque);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as DoubleAnimation, Button_ChangeBackground);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_AddIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_Screenshot);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_ClearIcon);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Image_QrCode);
-            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Button_Again);
-            storyBoard.Completed += (se, ev) => { ProgressRing.IsActive = false; Grid_Opaque.IsHitTestVisible = false; };
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(0) as DoubleAnimation, ProgressRing);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(1) as ColorAnimation, Grid_Opaque);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(2) as DoubleAnimation, Button_ChangeBackground);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_AddIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_Screenshot);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_ClearIcon);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(6) as DoubleAnimation, Image_QrCode);
+            Storyboard.SetTarget(storyBoard.Children.ElementAt(7) as DoubleAnimation, Button_Again);
+            storyBoard.Completed += (se, ev) => { Grid_Opaque.IsHitTestVisible = false; };
             storyBoard.Begin();
         }
 
@@ -874,7 +882,7 @@ namespace KinectPiPi
             Storyboard.SetTarget(storyBoard.Children.ElementAt(3) as DoubleAnimation, Button_AddIcon);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(4) as DoubleAnimation, Button_ClearIcon);
             Storyboard.SetTarget(storyBoard.Children.ElementAt(5) as DoubleAnimation, Button_Screenshot);
-            if(!isTimerCall)
+            if (!isTimerCall)
             {
                 idleCountdownTimer_Reset();
                 storyBoard.Completed += (s, ev) => { Image_QrCode.Visibility = System.Windows.Visibility.Collapsed; Grid_MainPage.IsHitTestVisible = true; };
@@ -896,7 +904,7 @@ namespace KinectPiPi
             }
         }
 
-        private void Button_Again_Click(object sender, RoutedEventArgs e)
+        private void Button_Again_Click (object sender, RoutedEventArgs e)
         {
             Button_Again_ClickEvent(isTimerCall: false);
         }

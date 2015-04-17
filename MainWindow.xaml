@@ -521,7 +521,7 @@
         <Storyboard x:Key="CountdownStoryboard">
             <ColorAnimation Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)" From="#00000000" To="#CC000000" Duration="0:0:0.5">
                 <ColorAnimation.EasingFunction>
-                    <QuarticEase EasingMode="EaseIn"/>
+                    <QuarticEase EasingMode="EaseOut"/>
                 </ColorAnimation.EasingFunction>
             </ColorAnimation>
             <ColorAnimation Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)" From="#CC000000" To="White" Duration="0:0:0.5" BeginTime="0:0:5">
@@ -534,8 +534,25 @@
                     <QuarticEase EasingMode="EaseOut"/>
                 </ColorAnimation.EasingFunction>
             </ColorAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:5.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="ProgressRingStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:1" BeginTime="0:0:0.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
         </Storyboard>
         <Storyboard x:Key="ShowResultStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuarticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
             <ColorAnimation Storyboard.TargetProperty="(Grid.Background).(SolidColorBrush.Color)" From="#CC000000" To="#00000000" Duration="0:0:0.5">
                 <ColorAnimation.EasingFunction>
                     <QuarticEase EasingMode="EaseOut"/>
@@ -681,7 +698,7 @@
                             <TranslateTransform/>
                         </Button.RenderTransform>
                     </Button>
-                    <Button Grid.Row="2" Name="Button_Again" Content="再玩一次" Style="{DynamicResource LeftButtonStyle}" Click="Button_Again_Click">
+                    <Button Grid.Row="2" Name="Button_Again" Content="再拍一次" Style="{DynamicResource LeftButtonStyle}" Click="Button_Again_Click">
                         <Button.RenderTransform>
                             <TranslateTransform X="-300"/>
                         </Button.RenderTransform>
@@ -700,7 +717,7 @@
                         </Button.RenderTransform>
                     </Button>
                     <Label Grid.Column="2" Grid.Row="2" Name="Label_IdleCounter" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontSize="48" FontWeight="Bold" Margin="0,5,15,0"/>
-                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="135" Height="135" Opacity="0"/>
+                    <Image Grid.Column="2" Grid.Row="1" Name="Image_QrCode" Width="99" Height="99" Opacity="0"/>
                     <Image Grid.Row="3" Grid.ColumnSpan="3" Source="Resources/bottom.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Fill"/>
                 </Grid>
                 <ScrollViewer Grid.Row="1" Name="ScrollViewer" Height="0" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Style="{DynamicResource ScrollViewerStyle}">
@@ -708,7 +725,7 @@
                 </ScrollViewer>
                 <Grid Name="Grid_Opaque" Grid.ColumnSpan="3" Grid.RowSpan="3" Background="#00000000" IsHitTestVisible="False">
                     <Label Name="Label_Counter" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="130" Foreground="White"/>
-                    <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="False"/>
+                    <Controls:ProgressRing Name="ProgressRing" Width="80" Height="80" Foreground="White" IsActive="True" Opacity="0"/>
                 </Grid>
             </Grid>
             <Grid Name="Grid_StartPage" Opacity="0">
