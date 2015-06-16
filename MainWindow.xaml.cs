@@ -519,6 +519,8 @@ namespace KinectPiPi
             upload.Add("no_story", "1");
             upload.Add("access_token", fb.AccessToken);
             upload.Add("@file.jpg", media);
+            //電算中心
+            //await fb.PostTaskAsync("/1622334784653266" + "/photos", upload);
             //樂學園
             await fb.PostTaskAsync("/535820436458616" + "/photos", upload);
             //Kinect拍拍
@@ -749,6 +751,9 @@ namespace KinectPiPi
             Image_Result.Source = renderBitmap;
             //saveBitmapToLocal(renderBitmap);
             resultBitmap = convertImageToByte(renderBitmap);
+            //電算中心
+            //drawQrCode("https://www.facebook.com/CYCU.MisKat", Image_QrCode);
+            //樂學園
             drawQrCode("https://www.facebook.com/CYCUstudent.club", Image_QrCode);
             //drawQrCode(await getImageUrlAsync(await postImageHttpWebRequsetAsync(convertImageToByte(renderBitmap))), Image_QrCode);
         }
