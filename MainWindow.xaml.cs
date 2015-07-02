@@ -24,7 +24,7 @@ using Gma.QrCodeNet.Encoding.Windows.Render;
 using Microsoft.Kinect;
 using Microsoft.Kinect.Wpf.Controls;
 
-namespace KinectPiPi
+namespace 樂拍機
 {
     /// <summary>
     /// MainWindow.xaml 的互動邏輯
@@ -515,7 +515,7 @@ namespace KinectPiPi
             media.FileName = "test.jpg";
             media.SetValue(filebytes);
             Dictionary<string, object> upload = new Dictionary<string, object>();
-            upload.Add("message", "樂拍機測試");
+            upload.Add("message", "");
             upload.Add("no_story", "1");
             upload.Add("access_token", fb.AccessToken);
             upload.Add("@file.jpg", media);
@@ -764,7 +764,7 @@ namespace KinectPiPi
             encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
             string time = System.DateTime.Now.ToString("yyyy'-'MM'-'dd'-'hh'-'mm'-'ss");
             string dirPath = @"Photo";
-            string path = System.IO.Path.Combine(@"Photo/", "KinectPiPi-" + time + ".jpg");
+            string path = System.IO.Path.Combine(@"Photo/", "樂拍機-" + time + ".jpg");
             if (Directory.Exists(dirPath))
             {
                 try

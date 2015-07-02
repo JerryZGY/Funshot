@@ -7,8 +7,8 @@
     <ProjectGuid>{0F1C5C5F-16C4-4E7B-A1B6-0E232CE29C4C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KinectPiPi</RootNamespace>
-    <AssemblyName>KinectPiPi-V2</AssemblyName>
+    <RootNamespace>樂拍機</RootNamespace>
+    <AssemblyName>樂拍機</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -33,7 +33,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>Bin\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -41,7 +41,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Kinect-V2.ico</ApplicationIcon>
+    <ApplicationIcon>樂拍機.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Facebook">
@@ -142,8 +142,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="樂拍機.ico" />
     <Resource Include="Resources\title.png" />
-    <Resource Include="Kinect-V2.ico" />
     <Content Include="Resources\Background\CYCU00.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -189,7 +189,6 @@
     <Content Include="Resources\Background\CYCU09.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\Kinect-V2.ico" />
     <Resource Include="Resources\bottom.png" />
     <Resource Include="Resources\Element\leftButton_MouseOver.png" />
     <Resource Include="Resources\Element\leftButton_Normal.png" />

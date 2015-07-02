@@ -8,7 +8,7 @@ using System;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 
-namespace KinectPiPi
+namespace 樂拍機
 {
     public class DraggableElement : Decorator, IKinectControl
     {

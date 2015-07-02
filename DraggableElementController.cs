@@ -5,7 +5,7 @@ using Microsoft.Kinect.Input;
 using Microsoft.Kinect.Toolkit.Input;
 using Microsoft.Kinect.Wpf.Controls;
 
-namespace KinectPiPi
+namespace 樂拍機
 {
     public class DraggableElementController : IKinectManipulatableController
     {

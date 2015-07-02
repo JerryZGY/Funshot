@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KinectPiPi.Properties {
+namespace 樂拍機.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
