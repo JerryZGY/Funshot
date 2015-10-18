@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Funshot")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("JZ'Studio")]
 [assembly: AssemblyProduct("Funshot")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("© 2015 JerryZ")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
