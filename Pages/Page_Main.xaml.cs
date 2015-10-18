@@ -38,6 +38,7 @@ namespace Funshot.Pages
             Grid_Main.Opacity = 0;
             Img_Removal.Opacity = 0;
             Img_UserView.Opacity = 0;
+            ProgressRing.Opacity = 0;
             idleCountdownTimer.Tick += idleCountdownTimer_Tick;
             screenShotCountdownTimer.Tick += screenShotCountdownTimer_Tick;
             idleCountdownTimer_Reset();

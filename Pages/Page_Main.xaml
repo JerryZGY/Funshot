@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Funshot.Pages" xmlns:c="http://schemas.microsoft.com/kinect/2014"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              mc:Ignorable="d" d:DesignWidth="1366" d:DesignHeight="768" Loaded="Page_Start_Loaded">
     <UserControl.Resources>
         <ResourceDictionary Source="../Resources/Res_Page_Main.xaml"/>
@@ -50,6 +51,7 @@
             </Grid>
             <Grid x:Name="Grid_Opaque" Style="{DynamicResource Grid_Opaque}">
                 <TextBlock x:Name="Tbx_ShotCounter" Style="{DynamicResource Tbx_ShotCounter}"/>
+                <Controls:ProgressRing x:Name="ProgressRing" Style="{DynamicResource ProgressRing}"/>
             </Grid>
             <ScrollViewer x:Name="ScrollViewer" Style="{DynamicResource ScrollViewer}">
                 <WrapPanel x:Name="WrapPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"/>
