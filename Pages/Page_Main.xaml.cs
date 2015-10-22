@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using Gma.QrCodeNet.Encoding;
+using Gma.QrCodeNet.Encoding.Windows.Render;
 
 namespace Funshot.Pages
 {
@@ -25,6 +29,7 @@ namespace Funshot.Pages
         private DraggableElement draggedElement;
         private Point mousePosition;
         private Image resultImage;
+        private RemoteHandler remote;
 
         public Page_Main()
         {
@@ -33,6 +38,7 @@ namespace Funshot.Pages
 
         public void InitializeProperty()
         {
+            remote = new RemoteHandler();
             Img_Removal.Source = Switcher.pageSwitcher.kinect.RemovalImageSource;
             Img_UserView.Source = Switcher.pageSwitcher.kinect.BodyIndexImageSource;
             Grid_Main.Opacity = 0;
@@ -209,14 +215,13 @@ namespace Funshot.Pages
             }
             else if (screenShotCountdownTimes == 0)
             {
+                screenShotCountdownTimer.Stop();
                 Tbx_ShotCounter.Text = "";
-                screenShotCountdownTimes--;
                 saveBitmap();
             }
-            else
+            else if (screenShotCountdownTimes == -1)
             {
                 screenShotCountdownTimer.Stop();
-                idleCountdownTimer_Reset();
                 StoryHandler.Begin(this, "ShowResult", () => Grid_Opaque.IsHitTestVisible = false);
             }
         }
@@ -224,8 +229,8 @@ namespace Funshot.Pages
         private void idleCountdownTimer_Reset()
         {
             idleCountdownTimer.Enabled = false;
-            Tbx_IdleCounter.Text = "60";
-            idleCountdownTimes = 60;
+            Tbx_IdleCounter.Text = "90";
+            idleCountdownTimes = 90;
             idleCountdownTimer.Enabled = true;
         }
 
@@ -253,6 +258,33 @@ namespace Funshot.Pages
             resultImage.Source = renderBitmap;
             Img_Result.Source = renderBitmap;
             saveBitmapToLocal(renderBitmap);
+            showResult(renderBitmap);
+        }
+
+        private async void showResult(RenderTargetBitmap renderBitmap)
+        {
+            if (await remote.IsRemoteConnected())
+            {
+                var text = await remote.GetImageUrlAsync(renderBitmap);
+                var source = drawQrCode(text);
+                Img_QrCode.Source = source;
+                StoryHandler.Begin(this, "ShowResult", () => Grid_Opaque.IsHitTestVisible = false);
+            }
+            else
+            {
+                screenShotCountdownTimes = -1;
+                screenShotCountdownTimer.Start();
+            }
+        }
+
+        private ImageSource drawQrCode(string text)
+        {
+            QrEncoder qrEncoder = new QrEncoder(ErrorCorrectionLevel.M);
+            QrCode qrCode;
+            qrEncoder.TryEncode(text, out qrCode);
+            WriteableBitmap wBitmap = new WriteableBitmap(111, 111, 96, 96, PixelFormats.Gray8, null);
+            new WriteableBitmapRenderer(new FixedModuleSize(3, QuietZoneModules.Two)).Draw(wBitmap, qrCode.Matrix);
+            return wBitmap;
         }
 
         private void saveBitmapToLocal(RenderTargetBitmap renderBitmap)
@@ -266,6 +298,7 @@ namespace Funshot.Pages
             {
                 try
                 {
+                    
                     using (FileStream fs = new FileStream(path, FileMode.Create))
                     {
                         encoder.Save(fs);
@@ -273,7 +306,7 @@ namespace Funshot.Pages
                 }
                 catch (IOException)
                 {
-                    string.Format(Properties.Resources.FailedSaveBitmapText, path);
+                    Trace.WriteLine(Properties.Resources.FailedSaveBitmapText);
                 }
             }
             else
@@ -288,7 +321,7 @@ namespace Funshot.Pages
                 }
                 catch (IOException)
                 {
-                    string.Format(Properties.Resources.FailedSaveBitmapText, path);
+                    Trace.WriteLine(Properties.Resources.FailedSaveBitmapText);
                 }
             }
         }

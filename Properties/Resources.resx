@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="FailedConnectRemoteText" xml:space="preserve">
+    <value>無法連線至遠端伺服器</value>
+  </data>
   <data name="FailedSaveBitmapText" xml:space="preserve">
-    <value>將照片存至{0}時發生錯誤</value>
+    <value>無法儲存照片至本機磁碟</value>
   </data>
 </root>

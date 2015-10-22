@@ -61,7 +61,16 @@ namespace Funshot.Properties {
         }
         
         /// <summary>
-        ///   查詢類似 將照片存至{0}時發生錯誤 的當地語系化字串。
+        ///   查詢類似 無法連線至遠端伺服器 的當地語系化字串。
+        /// </summary>
+        internal static string FailedConnectRemoteText {
+            get {
+                return ResourceManager.GetString("FailedConnectRemoteText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 無法儲存照片至本機磁碟 的當地語系化字串。
         /// </summary>
         internal static string FailedSaveBitmapText {
             get {

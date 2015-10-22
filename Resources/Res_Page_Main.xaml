@@ -72,6 +72,17 @@
         <Setter Property="Grid.RowSpan" Value="3"/>
         <Setter Property="Stretch" Value="Fill"/>
     </Style>
+    <Style x:Key="Img_QrCode" TargetType="{x:Type Image}">
+        <Setter Property="Width" Value="150"/>
+        <Setter Property="Height" Value="150"/>
+        <Setter Property="Grid.Column" Value="2"/>
+        <Setter Property="Grid.Row" Value="1"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform X="300"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style x:Key="Tbx_IdleCounter" TargetType="{x:Type TextBlock}">
         <Setter Property="Grid.Column" Value="2"/>
         <Setter Property="Grid.Row" Value="2"/>
@@ -411,12 +422,7 @@
                         <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
                         <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="True" CanVerticallyScroll="False" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0">
                             <ScrollContentPresenter.Content>
-                                <ContentPresenter x:Name="PART_ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}">
-                                    <ContentPresenter.Margin>
-                                        <Binding ConverterParameter="TopBottomLeftRight" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                        </Binding>
-                                    </ContentPresenter.Margin>
-                                </ContentPresenter>
+                                <ContentPresenter x:Name="PART_ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}"/>
                             </ScrollContentPresenter.Content>
                         </ScrollContentPresenter>
                         <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}">
@@ -553,22 +559,6 @@
                         </ScrollBar>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="HorizontalScrollBarVisibility" Value="Disabled">
-                            <Setter Property="Margin" TargetName="PART_ContentPresenter">
-                                <Setter.Value>
-                                    <Binding ConverterParameter="TopBottom" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                    </Binding>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="VerticalScrollBarVisibility" Value="Disabled">
-                            <Setter Property="Margin" TargetName="PART_ContentPresenter">
-                                <Setter.Value>
-                                    <Binding ConverterParameter="LeftRight" Path="ContentMargin" RelativeSource="{RelativeSource TemplatedParent}">
-                                    </Binding>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="HorizontalScrollBarVisibility" Value="Disabled"/>
@@ -669,10 +659,16 @@
                 <QuarticEase EasingMode="EaseOut"/>
             </DoubleAnimation.EasingFunction>
         </DoubleAnimation>
+        <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.5" BeginTime="0:0:1.25" Storyboard.TargetName="Img_QrCode">
+            <DoubleAnimation.EasingFunction>
+                <QuarticEase EasingMode="EaseOut"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
         <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)" From="-300" To="0" Duration="0:0:0.5" BeginTime="0:0:1.5" Storyboard.TargetName="Btn_Again">
             <DoubleAnimation.EasingFunction>
                 <QuarticEase EasingMode="EaseOut"/>
             </DoubleAnimation.EasingFunction>
         </DoubleAnimation>
+
     </Storyboard>
 </ResourceDictionary>

@@ -21,8 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -48,6 +47,10 @@
     <ApplicationIcon>Funshot.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gma.QrCodeNet.Encoding, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\QrCode.Net.0.4.0.0\lib\net45\Gma.QrCodeNet.Encoding.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
@@ -98,6 +101,7 @@
     <Compile Include="Common\IPage.cs" />
     <Compile Include="Common\KinectHandler.cs" />
     <Compile Include="Common\MusicHandler.cs" />
+    <Compile Include="Common\RemoteHandler.cs" />
     <Compile Include="Common\StoryHandler.cs" />
     <Compile Include="Common\Switcher.cs" />
     <Compile Include="PageSwitcher.xaml.cs">
@@ -177,6 +181,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Assemblies\MahApps.Metro.dll" />
     <EmbeddedResource Include="Assemblies\System.Windows.Interactivity.dll" />
+    <EmbeddedResource Include="Assemblies\Gma.QrCodeNet.Encoding.dll" />
     <Content Include="Materials\Backgrounds\BG0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

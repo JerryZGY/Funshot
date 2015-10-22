@@ -57,7 +57,8 @@ namespace Funshot
 
         public void setKinectRegionBinding(ref KinectRegion reg)
         {
-            BindingOperations.SetBinding(reg, KinectRegion.KinectSensorProperty, new Binding("Kinect") { Source = kinectSensor });
+            if (kinectSensor.IsAvailable)
+                BindingOperations.SetBinding(reg, KinectRegion.KinectSensorProperty, new Binding("Kinect") { Source = kinectSensor });
         }
 
         private void Reader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)

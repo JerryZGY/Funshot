@@ -48,6 +48,7 @@
                     </Button.RenderTransform>
                 </Button>
                 <Button x:Name="Btn_Screenshot" Content="拍攝照片" Style="{DynamicResource Btn_Right}" Click="Btn_Screenshot_Click"/>
+                <Image x:Name="Img_QrCode" Style="{DynamicResource Img_QrCode}"/>
             </Grid>
             <Grid x:Name="Grid_Opaque" Style="{DynamicResource Grid_Opaque}">
                 <TextBlock x:Name="Tbx_ShotCounter" Style="{DynamicResource Tbx_ShotCounter}"/>
