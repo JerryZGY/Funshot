@@ -48,7 +48,8 @@ namespace Funshot.Pages
             idleCountdownTimer.Tick += idleCountdownTimer_Tick;
             screenShotCountdownTimer.Tick += screenShotCountdownTimer_Tick;
             idleCountdownTimer_Reset();
-            foreach (string fname in Directory.GetFileSystemEntries(@"Materials/Backgrounds", "*.png"))
+            setDefaultBackgroundImage();
+            foreach (string fname in Directory.GetFileSystemEntries(@"Materials/Backgrounds", "*.jpg"))
             {
                 var button = new Button
                 {
@@ -238,6 +239,16 @@ namespace Funshot.Pages
         {
             idleCountdownTimer.Enabled = false;
             Tbx_IdleCounter.Text = "";
+        }
+
+        private void setDefaultBackgroundImage()
+        {
+            var bmp = new BitmapImage();
+            bmp.BeginInit();
+            bmp.UriSource = new Uri(@"Materials/Backgrounds/BG0.jpg", UriKind.Relative);
+            bmp.CacheOption = BitmapCacheOption.OnLoad;
+            bmp.EndInit();
+            Img_BG.Source = bmp;
         }
 
         private void saveBitmap()

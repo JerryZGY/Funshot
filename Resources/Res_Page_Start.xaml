@@ -2,11 +2,6 @@
     <Style x:Key="Grid_Main" TargetType="{x:Type Grid}">
         <Setter Property="Width" Value="1366"/>
         <Setter Property="Height" Value="768"/>
-        <Setter Property="Background">
-            <Setter.Value>
-                <ImageBrush ImageSource="/Funshot;component/Materials/StartGround.png"/>
-            </Setter.Value>
-        </Setter>
     </Style>
     <Style x:Key="Img_Title" TargetType="{x:Type Image}">
         <Setter Property="Width" Value="450"/>

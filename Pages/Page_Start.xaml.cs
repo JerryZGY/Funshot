@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Funshot.Pages
 {
@@ -12,8 +14,9 @@ namespace Funshot.Pages
 
         public void InitializeProperty()
         {
-            Grid_Main.Opacity = 0;
             Img_Title.Opacity = 0;
+            Grid_Main.Opacity = 0;
+            Grid_Main.Background = new ImageBrush(new BitmapImage(new Uri(@"Materials/Backgrounds/BG0.jpg", UriKind.Relative)));
             Switcher.pageSwitcher.kinect.setKinectRegionBinding(ref Reg);
         }
 

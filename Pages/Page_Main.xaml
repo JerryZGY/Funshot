@@ -28,7 +28,7 @@
                 <Image Style="{DynamicResource Img_Left}"/>
                 <Image Style="{DynamicResource Img_Right}"/>
                 <Image Style="{DynamicResource Img_Bottom}"/>
-                <Image x:Name="Img_BG" Style="{DynamicResource Img_BG}" Source="/Funshot;component/Materials/StartGround.png"/>
+                <Image x:Name="Img_BG" Style="{DynamicResource Img_BG}"/>
                 <Image x:Name="Img_Removal" Style="{DynamicResource Img_Removal}"/>
                 <Canvas x:Name="Cnv" Style="{DynamicResource Cnv}" MouseLeftButtonDown="CanvasMouseLeftButtonDown" MouseLeftButtonUp="CanvasMouseLeftButtonUp" MouseMove="CanvasMouseMove"/>
                 <Image x:Name="Img_Result" Style="{DynamicResource Img_Result}"/>

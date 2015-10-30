@@ -167,7 +167,9 @@
     <EmbeddedResource Include="Assemblies\Microsoft.Kinect.dll" />
     <EmbeddedResource Include="Assemblies\Microsoft.Kinect.Wpf.Controls.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Materials\Backgrounds\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Funshot.ico" />
   </ItemGroup>
@@ -175,31 +177,12 @@
     <Resource Include="Materials\Bottom.png" />
     <Resource Include="Materials\Left.png" />
     <Resource Include="Materials\Right.png" />
-    <Resource Include="Materials\StartGround.png" />
     <Resource Include="Materials\Title.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assemblies\MahApps.Metro.dll" />
     <EmbeddedResource Include="Assemblies\System.Windows.Interactivity.dll" />
     <EmbeddedResource Include="Assemblies\Gma.QrCodeNet.Encoding.dll" />
-    <Content Include="Materials\Backgrounds\BG0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Materials\Backgrounds\BG1.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Materials\Backgrounds\BG2.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Materials\Backgrounds\BG3.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Materials\Backgrounds\BG4.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Materials\Backgrounds\BG5.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Materials\BtnLeft_Normal.png" />
     <Resource Include="Materials\BtnLeft_Over.png" />
     <Resource Include="Materials\BtnLeft_Pressed.png" />
@@ -230,6 +213,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Materials\Icons\ICON5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Materials\Icons\ICON6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Materials\Icons\ICON7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
